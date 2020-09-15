@@ -8,10 +8,10 @@
     <version>2.2.4.RELEASE</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-  <groupId>toDoList</groupId>
-  <artifactId>toDoList</artifactId>
+  <groupId>skillbox</groupId>
+  <artifactId>diplom</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>toDoList</name>
+  <name>MySpringProject</name>
   <description>Demo project for Spring Boot</description>
 
   <properties>
