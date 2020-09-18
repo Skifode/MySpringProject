@@ -1,16 +1,26 @@
 package main.model;
 
+import java.sql.Timestamp;
 import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
+import main.enums.Status;
 
 @Data @Entity
 public class Posts {
@@ -30,10 +40,11 @@ public class Posts {
   @Column(nullable = true)
   private int moderatorId; //ID пользователя-модератора, принявшего решение, или NULL
 
-  @Column(nullable = false)
-  private int userID; //автор поста
+  @Column(nullable = false, name = "user_id", insertable = false, updatable = false)
+  private int userId; //автор поста
 
   @Column(nullable = false, columnDefinition = "DATETIME")
+  @Setter(AccessLevel.NONE)
   @Temporal(TemporalType.DATE)
   private Date time; //дата и время публикации поста
 
@@ -45,10 +56,12 @@ public class Posts {
 
   @Column(nullable = false)
   private int viewCount; //количество просмотров поста
-}
 
-enum Status {
-      NEW,
-      ACCEPTED,
-      DECLINED
+  public void setDate(String stringDate) {
+    this.time = Date.from(Timestamp.valueOf(stringDate).toInstant());
+  }
+
+  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private Users user;
 }

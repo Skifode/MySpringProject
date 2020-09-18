@@ -15,7 +15,7 @@ public class GlobalSettings {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id; //id настройки
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String code; //системное имя настройки
 
   @Column(nullable = false)
