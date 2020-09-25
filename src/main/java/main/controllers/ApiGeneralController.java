@@ -1,26 +1,26 @@
 package main.controllers;
 
-import main.model.GlobalSettings;
-import main.repositories.GlobalSettingsRepository;
-import main.repositories.Init;
+import main.api.response.SettingsResponse;
+import main.api.response.InitResponse;
+import main.service.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ApiGeneralController {
 
-  private final Init initInfo = new Init();
   @Autowired
-  private GlobalSettingsRepository globalSettingsRepository;
+  private InitResponse initResponseInfo;
+
+  @Autowired
+  private SettingsService settings;
 
   @GetMapping("/api/init")
-  public ResponseEntity<Init> init() {
-    return new ResponseEntity<>(initInfo, HttpStatus.OK);
+  public ResponseEntity<InitResponse> init() {
+    return new ResponseEntity<>(initResponseInfo, HttpStatus.OK);
   }
 
   @GetMapping("/api/tag")
@@ -30,24 +30,7 @@ public class ApiGeneralController {
   }
 
   @GetMapping("/api/settings")
-  public ResponseEntity<Model> settings(Model model) {
-
-    /*
-
-                  тут небольшой костыль для человечества,
-                     но очень важный костыль для меня
-
-                          !доделать потом!
-
-     */
-
-    model.addAttribute("MULTIUSER_MODE", globalSettingsRepository.getById(1)
-        .getValue().equals("YES"));
-    model.addAttribute("POST_PREMODERATION", globalSettingsRepository.getById(2)
-        .getValue().equals("YES"));
-    model.addAttribute("STATISTICS_IS_PUBLIC", globalSettingsRepository.getById(3)
-        .getValue().equals("YES"));
-
-    return new ResponseEntity<>(model, HttpStatus.OK);
+  public ResponseEntity<SettingsResponse> settings() {
+    return new ResponseEntity<>(settings.getGlobalSettings(), HttpStatus.OK);
   }
 }

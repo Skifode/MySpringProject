@@ -15,7 +15,7 @@ public class CaptchaCodes {
 
   @Id
   @Column(nullable = false)
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id; //id каптча
 
   @Column(nullable = false, columnDefinition = "DATETIME")

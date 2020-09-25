@@ -1,9 +1,8 @@
 package main.model;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,8 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -20,14 +17,12 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
-@Data @Entity @ToString(exclude = "posts")
+@Data @Entity @ToString(exclude = {"posts", "comments", "votes"})
 public class Users {
 
   @Id @Column(nullable = false)
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id; //id пользователя
 
   @Column(nullable = false, columnDefinition = "TINYINT")
@@ -55,7 +50,15 @@ public class Users {
   private String photo; //фотография (ссылка на файл), может быть NULL
 
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-  @Fetch(value = FetchMode.SELECT)
-  private Set<Posts> posts;
+  @OneToMany(
+      mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  private List<Post> posts = new ArrayList<>();
+
+  @OneToMany(
+      mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  private List<PostComments> comments = new ArrayList<>();
+
+  @OneToMany(
+      mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  private  List<PostVotes> votes = new ArrayList<>();
 }

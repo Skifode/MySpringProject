@@ -1,4 +1,4 @@
-package main.enums;
+package main.data;
 
 public enum Status {
   NEW,

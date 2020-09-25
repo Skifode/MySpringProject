@@ -3,7 +3,7 @@ package main.controllers;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import main.model.Posts;
+import main.model.Post;
 import main.repositories.PostsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,34 +24,40 @@ public class ApiPostController {
 
     int count = (int) postsRepository.count();
 
-    ArrayList<Posts> posts = new ArrayList<>();
-    postsRepository.findAll().forEach(posts::add);
+    ArrayList<Post> postList = new ArrayList<>();
+    postsRepository.findAll().forEach(postList::add);
 
     ModelMap[] modelMass = new ModelMap[count];
 
     for(int i = 0; i < count; i++) {
+      Post post = postList.get(i);
+
       ModelMap modelMap = new ModelMap();
 
       ModelMap mm2 = new ModelMap();
-      mm2.addAttribute("id", posts.get(i).getUser().getId());
-      mm2.addAttribute("name", posts.get(i).getUser().getName());
+      mm2.addAttribute("id", post.getUser().getId());
+      mm2.addAttribute("name", post.getUser().getName());
 
-      String date = posts.get(i).getTime().toString();
+      String date = post.getTime().toString();
 
       /*
       ГОСПОДИ, ПРОСТИ ЗА ЭТОТ КОД
       Я ПРОСТО ПЫТАЮСЬ ПОНЯТЬ КАК ЭТО РАБОТАЕТ
        */
 
-      modelMap.addAttribute("id", posts.get(i).getId());
-      modelMap.addAttribute("timestamp", LocalDate.parse(date).atStartOfDay().atZone(ZoneId.of("UTC")).toEpochSecond());
+      modelMap.addAttribute("id", post.getId());
+      modelMap.addAttribute("timestamp", LocalDate.parse(date)
+          .atStartOfDay()
+          .atZone(ZoneId.of("UTC"))
+          .toEpochSecond());
+
       modelMap.addAttribute("user", mm2);
-      modelMap.addAttribute("title", posts.get(i).getTitle());
+      modelMap.addAttribute("title", post.getTitle());
       modelMap.addAttribute("announce", "АНОНС ПОСТА");
-      modelMap.addAttribute("likeCount", 36);
-      modelMap.addAttribute("dislikeCount", 3);
-      modelMap.addAttribute("commentCount", 15);
-      modelMap.addAttribute("viewCount", 55);
+      modelMap.addAttribute("likeCount", post.getLikesCount());
+      modelMap.addAttribute("dislikeCount", post.getDislikeCount());
+      modelMap.addAttribute("commentCount", post.getCommentsList().size());
+      modelMap.addAttribute("viewCount", 404);
 
     modelMass[i] = modelMap;
     }

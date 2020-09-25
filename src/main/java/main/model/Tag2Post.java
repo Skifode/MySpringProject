@@ -12,13 +12,13 @@ public class Tag2Post {
 
   @Id
   @Column(nullable = false)
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id; //id связи
 
-  @Column(nullable = false)
+  @Column(nullable = false, name = "post_id")
   private int postId; //id поста
 
-  @Column(nullable = false)
+  @Column(nullable = false, name = "tag_id")
   private int tagId; //id тэга
 
 }

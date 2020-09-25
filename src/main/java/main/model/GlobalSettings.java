@@ -12,7 +12,7 @@ public class GlobalSettings {
 
   @Id
   @Column(nullable = false)
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id; //id настройки
 
   @Column(nullable = false, unique = true)
