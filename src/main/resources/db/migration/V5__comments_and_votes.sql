@@ -1,0 +1,30 @@
+INSERT INTO `post_comments` (`id`, `post_id`, `text`, `time`, `user_id`) VALUES ('1', '1', 'АфФт@р ЖжОт!11адын!1', '2020-05-23', '1');
+INSERT INTO `post_comments` (`id`, `parent_id`, `post_id`, `text`, `time`, `user_id`) VALUES ('2', '1', '1', 'пАдонКи иЩо ни вЫмиrЛи?7', '2020-05-23', '2');
+INSERT INTO `post_comments` (`id`, `post_id`, `text`, `time`, `user_id`) VALUES ('3', '3', 'Интересно. Спасибо.', '2020-05-23', '3');
+INSERT INTO `post_comments` (`id`, `post_id`, `text`, `time`, `user_id`) VALUES ('4', '4', 'Мой первый пост)', '2020-05-23', '4');
+INSERT INTO `post_comments` (`id`, `parent_id`, `post_id`, `text`, `time`, `user_id`) VALUES ('5', '2', '1', 'facepalm.jpg', '2020-05-23', '5');
+INSERT INTO `post_comments` (`id`, `post_id`, `text`, `time`, `user_id`) VALUES ('6', '8', 'Норм.', '2020-05-23', '6');
+INSERT INTO `post_comments` (`id`, `post_id`, `text`, `time`, `user_id`) VALUES ('7', '5', 'Продам гараж!', '2020-05-23', '7');
+INSERT INTO `post_comments` (`id`, `post_id`, `text`, `time`, `user_id`) VALUES ('8', '11', 'Я не дизайнер, но книга интересная! Ставлю лайк!', '2020-05-23', '6');
+INSERT INTO `post_comments` (`id`, `post_id`, `text`, `time`, `user_id`) VALUES ('9', '9', 'Пью чай и пишу это.', '2020-05-23', '5');
+INSERT INTO `post_comments` (`id`, `post_id`, `text`, `time`, `user_id`) VALUES ('10', '2', 'Ну такое :/', '2020-05-23', '4');
+INSERT INTO `post_comments` (`id`, `parent_id`, `post_id`, `text`, `time`, `user_id`) VALUES ('11', '8', '11', '*злобный коммент*!', '2020-05-23', '3');
+INSERT INTO `post_comments` (`id`, `parent_id`, `post_id`, `text`, `time`, `user_id`) VALUES ('12', '11', '11', 'Ты - странный.', '2020-05-23', '2');
+INSERT INTO `post_comments` (`id`, `parent_id`, `post_id`, `text`, `time`, `user_id`) VALUES ('13', '8', '11', 'Ещё раз и бан!', '2020-05-23', '1');
+
+
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('1', '11', '2020-05-23', '1', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('2', '11', '2020-05-23', '2', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('3', '11', '2020-05-23', '3', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('4', '11', '2020-05-23', '4', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('5', '11', '2020-05-23', '5', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('6', '11', '2020-05-23', '6', '-1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('7', '1', '2020-05-23', '7', '-1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('8', '2', '2020-05-23', '6', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('9', '3', '2020-05-23', '5', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('10', '4', '2020-05-23', '4', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('11', '4', '2020-05-23', '3', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('12', '6', '2020-05-23', '2', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('13', '6', '2020-05-23', '1', '1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('14', '6', '2020-05-23', '5', '-1');
+INSERT INTO `post_votes` (`id`, `post_id`, `time`, `user_id`, `value`) VALUES ('15', '7', '2020-05-23', '3', '1');

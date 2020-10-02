@@ -40,11 +40,11 @@ public class Users {
   @Column(nullable = false)
   private String email; //e-mail пользователя
 
-  @Column(nullable = false)
-  private int password; //хэш пароля пользователя
+  @Column(nullable = false, columnDefinition = "VARCHAR(255)")
+  private String password; //хэш пароля пользователя
 
-  @Column(nullable = true)
-  private int code; //код для восстановления пароля, может быть NULL
+  @Column(nullable = true, columnDefinition = "VARCHAR(255)")
+  private String code; //код для восстановления пароля, может быть NULL
 
   @Column(columnDefinition = "TEXT", nullable = true)
   private String photo; //фотография (ссылка на файл), может быть NULL

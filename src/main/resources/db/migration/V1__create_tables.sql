@@ -23,7 +23,7 @@ id integer not null auto_increment,
 
 create table post (
 id integer not null auto_increment,
- is_active TINYINT(1) DEFAULT 1 not null,
+ is_active TINYINT not null,
   moderation_status VARCHAR(32) DEFAULT 'NEW' not null,
    moderator_id integer, text TEXT not null, time DATETIME not null,
     title varchar(255) not null,
@@ -45,14 +45,14 @@ id integer not null auto_increment,
  post_id integer not null,
   time DATETIME not null,
    user_id integer not null,
-    value TINYINT(1) DEFAULT 0 not null,
+    value TINYINT not null,
      primary key (id));
 
 create table tag2post (
-id integer not null,
- post_id integer not null auto_increment,
+id integer not null auto_increment,
+ post_id integer not null,
   tag_id integer not null,
-   primary key (post_id, tag_id));
+   primary key (id));
 
 create table tags (
 id integer not null auto_increment,
@@ -61,11 +61,11 @@ id integer not null auto_increment,
 
 create table users (
 id integer not null auto_increment,
- code integer,
+ code varchar(255),
   email varchar(255) not null,
    is_moderator TINYINT not null,
     name varchar(255) not null,
-     password integer not null,
+     password varchar(255) not null,
       photo TEXT,
        reg_time DATETIME not null,
         primary key (id));
@@ -76,5 +76,3 @@ alter table post_comments add constraint FKsnxoecngu89u3fh4wdrgf0f2g foreign key
 alter table post_comments add constraint FKc3b7s6wypcsvua2ycn4o1lv2c foreign key (parent_id) references post_comments (id);
 alter table post_votes add constraint FKkii0lkyj3a3jj95vgym33ho4b foreign key (post_id) references post (id);
 alter table post_votes add constraint FK9q09ho9p8fmo6rcysnci8rocc foreign key (user_id) references users (id);
-alter table tag2post add constraint FK2nnf4bm2w83lqajy78ib6eerb foreign key (post_id) references post (id);
-alter table tag2post add constraint FKjou6suf2w810t2u3l96uasw3r foreign key (tag_id) references tags (id);

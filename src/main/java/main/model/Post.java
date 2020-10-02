@@ -35,7 +35,7 @@ public class Post {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id; //id поста
 
-  @Column(columnDefinition = "TINYINT DEFAULT 1", nullable = false)
+  @Column(columnDefinition = "TINYINT", nullable = false)
   private boolean isActive; //скрыта или активна публикация: 0 или 1
 
   @Column(columnDefinition = "VARCHAR(32) DEFAULT 'NEW'", nullable = false)
@@ -110,10 +110,14 @@ public class Post {
   private  List<PostVotes> votes = new ArrayList<>();
 
   public long getLikesCount() {
-    return votes.stream().filter(PostVotes::isValue).count();
+    return votes.stream().filter(vote -> vote.getValue() > 0).count();
   }
 
   public long getDislikeCount() {
-    return votes.size()-votes.stream().filter(PostVotes::isValue).count();
+    return votes.stream().filter(vote -> vote.getValue() < 0).count();
+  }
+  //==================================================
+  public void incrementView() {
+    setViewCount(getViewCount()+1);
   }
 }

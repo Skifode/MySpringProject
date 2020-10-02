@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import lombok.Data;
@@ -27,7 +26,7 @@ public class PostComments {
   private int id; //id комментария
 
   @Column(nullable = true, name = "parent_id", insertable=false, updatable=false)
-  private int parentId; //комментарий, на который оставлен этот комментарий
+  private Integer parentId; //комментарий, на который оставлен этот комментарий
                         // (можетбыть NULL, если комментарий оставлен просто к посту)
 
 
@@ -59,7 +58,7 @@ public class PostComments {
   //============== КОММЕНТЫ НА КОММЕНТЫ ==============
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  @JoinColumn(name = "parent_id", nullable = false)
+  @JoinColumn(name = "parent_id", nullable = true)
   private List<PostComments> comments2commentList = new ArrayList<>();
 
   public void addComment(PostComments comment) {

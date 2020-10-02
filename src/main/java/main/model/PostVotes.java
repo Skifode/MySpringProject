@@ -33,8 +33,8 @@ public class PostVotes {
   @Temporal(TemporalType.DATE)
   private Date time; //дата и время лайка / дизлайка
 
-  @Column(columnDefinition = "TINYINT DEFAULT 0", nullable = false)
-  private boolean value; //лайк или дизлайк: 1 или -1
+  @Column(columnDefinition = "TINYINT", nullable = false)
+  private byte value; //лайк или дизлайк: 1 или -1
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
