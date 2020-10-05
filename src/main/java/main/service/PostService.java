@@ -2,9 +2,11 @@ package main.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Data;
 import main.api.response.PostCommentsResponse;
 import main.api.response.PostResponse;
+import main.api.response.PostsListResponse;
 import main.api.response.SinglePostResponse;
 import main.model.Post;
 import main.model.PostComments;
@@ -34,27 +36,32 @@ public class PostService {
 
   //тут пока не разобрался до конца тоже
 
-  public List<PostResponse> getPosts(int offset, int limit, String mode) {
+  public PostsListResponse getPosts(int offset, int limit, String mode) {
 
-    ArrayList<PostResponse> serviceObjects = new ArrayList<>();
+    List<Post> posts = new ArrayList<>();
 
     switch (mode)
     {
-      case "recent" : new ArrayList<>(postsRepository.findByRecentIdFromTo(offset, offset+limit))
-          .forEach(pos -> serviceObjects.add(new PostResponse(pos)));
+      case "recent" : posts = postsRepository.findByRecentIdFromTo(offset, offset + limit);
         break;
-      case "popular" : new ArrayList<>(postsRepository.findByPopularIdFromTo(offset, offset+limit))
-          .forEach(pos -> serviceObjects.add(new PostResponse(pos)));
+      case "popular":
+        posts = postsRepository.findByPopularIdFromTo(offset, offset + limit);
         break;
-      case "best" : new ArrayList<>(postsRepository.findByBestIdFromTo(offset, offset+limit))
-          .forEach(pos -> serviceObjects.add(new PostResponse(pos)));
+      case "best":
+        posts = postsRepository.findByBestIdFromTo(offset, offset + limit);
         break;
-      case "early" : new ArrayList<>(postsRepository.findByEarlyIdFromTo(offset, offset+limit))
-          .forEach(pos -> serviceObjects.add(new PostResponse(pos)));
+      case "early":
+        posts = postsRepository.findByEarlyIdFromTo(offset, offset + limit);
         break;
     }
+    List<PostResponse> postResponses = posts.stream()
+        .map(PostResponse::new)
+        .collect(Collectors.toList());
 
-    return serviceObjects;
+    return PostsListResponse.builder()
+        .posts(postResponses)
+        .count(postsRepository.count())
+        .build();
   }
 
   public SinglePostResponse getPostById(int id) {
