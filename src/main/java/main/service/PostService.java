@@ -16,6 +16,8 @@ import main.repositories.PostsRepository;
 import main.repositories.Tag2PostRepository;
 import main.repositories.TagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Data
@@ -38,21 +40,14 @@ public class PostService {
 
   public PostsListResponse getPosts(int offset, int limit, String mode) {
 
+    Pageable pageable = PageRequest.of(offset/limit, limit);
     List<Post> posts = new ArrayList<>();
 
-    switch (mode)
-    {
-      case "recent" : posts = postsRepository.findByRecentIdFromTo(offset, offset + limit);
-        break;
-      case "popular":
-        posts = postsRepository.findByPopularIdFromTo(offset, offset + limit);
-        break;
-      case "best":
-        posts = postsRepository.findByBestIdFromTo(offset, offset + limit);
-        break;
-      case "early":
-        posts = postsRepository.findByEarlyIdFromTo(offset, offset + limit);
-        break;
+    switch (mode) { //красота
+      case "recent" -> posts = postsRepository.findByRecent(pageable);
+      case "popular" -> posts = postsRepository.findByPopular(pageable);
+      case "best" -> posts = postsRepository.findByBest(pageable);
+      case "early" -> posts = postsRepository.findByEarly(pageable);
     }
     List<PostResponse> postResponses = posts.stream()
         .map(PostResponse::new)
