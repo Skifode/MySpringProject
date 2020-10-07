@@ -12,4 +12,9 @@ public class DefaultController {
   {
     return "index";
   }
+
+  @RequestMapping(method = {RequestMethod.OPTIONS, RequestMethod.GET}, value = "/**/{path:[^\\\\.]*}")
+  public String redirectToIndex() {
+    return "forward:/"; //делаем перенаправление
+  }
 }
