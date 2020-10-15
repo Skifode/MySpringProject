@@ -3,6 +3,7 @@ package main.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import main.api.response.TagListResponse;
 import main.api.response.TagResponse;
 import main.model.Tags;
 import main.repositories.PostsRepository;
@@ -23,7 +24,7 @@ public class TagService {
   @Autowired
   private Tag2PostRepository tag2PostRepository;
 
-  public List<TagResponse> getTagList() {
+  public TagListResponse getTagList() {
     List<TagResponse> response = new ArrayList<>();
     double countOfPosts = postsRepository.count();
 
@@ -33,16 +34,23 @@ public class TagService {
 
     for (Tags tag : tagsList
     ) {
-      double weight = tag2PostRepository.getByTagId(tag.getId()).size()/countOfPosts;
+      String name = tag.getName();
+      double weight = tag2PostRepository.findByTagId(tag.getId()).size()/countOfPosts;
 
       if (weight>normWeight.get()) {
         normWeight.set(weight);
       }
-      response.add(new TagResponse(tag.getName(), weight));
+
+      response.add(TagResponse.builder()
+          .name(name)
+          .weight(weight)
+          .build());
     }
-    response.forEach(tagResponse -> {
-      tagResponse.setWeight(tagResponse.getWeight()*(1/normWeight.get()));
-    });
-    return response;
+    response.forEach(tagResponse -> tagResponse
+        .setWeight(tagResponse.getWeight()*(1/normWeight.get())));
+    return TagListResponse
+        .builder()
+        .tags(response)
+        .build();
   }
 }

@@ -2,6 +2,7 @@ package main.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,12 +15,24 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Data @Entity @ToString(exclude = {"posts", "comments", "votes"})
-public class Users {
+@AllArgsConstructor @NoArgsConstructor
+public class Users { //это тут временно
+  public Users(String email, String password, String name) {
+    this.isModerator = false;
+    this.email = email;
+    this.password = password;
+    this.name = name;
+    this.regTime = new GregorianCalendar().getTime();
+    this.photo = "/img/default-1.png";
+    this.code = "none";
+  }
 
   @Id @Column(nullable = false)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
