@@ -20,6 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import main.data.Role;
 
 @Data @Entity @ToString(exclude = {"posts", "comments", "votes"})
 @AllArgsConstructor @NoArgsConstructor
@@ -61,6 +62,10 @@ public class Users { //это тут временно
 
   @Column(columnDefinition = "TEXT", nullable = true)
   private String photo; //фотография (ссылка на файл), может быть NULL
+
+  public Role getRole(){
+    return isModerator()? Role.MODERATOR: Role.USER;
+  }
 
 
   @OneToMany(

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,10 +20,11 @@ public class ApiPostController {
   @Autowired
   private PostService postService;
 
+ // @PreAuthorize("hasAuthority('user:write')")
   @GetMapping("/api/post") public ResponseEntity<PostsListResponse> getPosts(
-      @RequestParam int offset,
-      @RequestParam int limit,
-      @RequestParam String mode) {
+      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(defaultValue = "10") int limit,
+      @RequestParam(defaultValue = "recent") String mode) {
     return new ResponseEntity<>(postService.getPosts(offset,limit,mode), HttpStatus.OK);
   }
 
@@ -33,22 +35,23 @@ public class ApiPostController {
 
   @GetMapping("/api/post/byTag")
   public ResponseEntity<PostsListResponse> getPostByTag(
-      @RequestParam int offset,
-      @RequestParam int limit,
-      @RequestParam String tag) {
+      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(defaultValue = "10") int limit,
+      @RequestParam(defaultValue = "Java") String tag) {
     return new ResponseEntity<>(postService.getPostsByTag(offset, limit, tag), HttpStatus.OK);
   }
   @GetMapping("/api/post/byDate")
   public ResponseEntity<PostsListResponse> getPostByDate(
-      @RequestParam int offset,
-      @RequestParam int limit,
+      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(defaultValue = "10") int limit,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
     return new ResponseEntity<>(postService.getPostsByDate(offset, limit, date), HttpStatus.OK);
   }
   @GetMapping("/api/post/search")
+  @PreAuthorize("hasAuthority('user:moderate')")
   public ResponseEntity<PostsListResponse> getPostByQuery(
-      @RequestParam int offset,
-      @RequestParam int limit,
+      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(defaultValue = "10") int limit,
       @RequestParam(defaultValue = "") String query) {
     return new ResponseEntity<>(postService.getPostsByQuery(offset, limit, query), HttpStatus.OK);
   }

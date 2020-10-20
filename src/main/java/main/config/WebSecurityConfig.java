@@ -1,63 +1,59 @@
 package main.config;
 
-import javax.sql.DataSource;
-import main.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-  @Autowired
-  UsersService userService;
+  private final UserDetailsService userDetailsService;
 
   @Autowired
-  private DataSource dataSource;
+  public WebSecurityConfig(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
+    this.userDetailsService = userDetailsService;
+  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http
-        .csrf()
-           .disable()
-           .authorizeRequests()
-           //Доступ только для не зарегистрированных пользователей
-           .antMatchers("/api/auth/register").not().fullyAuthenticated()
-           //Доступ только для пользователей с ролью Модератор
-           .antMatchers("/somesecretpage/**").hasRole("MODERATOR")
-           //Доступ разрешен всем пользователям
-            .antMatchers( //тут пока не понял
-                "/", "/css/**", "/js/**", "/search/**", "/api/post/**", "/api/tag/**"
-                , "/api/calendar/**", "/api/settings", "/api/init").permitAll()
-           //Все остальные страницы требуют аутентификации
-        .anyRequest().authenticated()
+    http.csrf().disable()
+        .authorizeRequests()
+        .antMatchers("/**").permitAll()
+        .anyRequest()
+        .authenticated()
         .and()
-            //Настройка для входа в систему
-            .formLogin()
-            .loginPage("/login")
-           //Перенарпавление на главную страницу после успешного входа
-           .defaultSuccessUrl("/")
-           .permitAll()
-        .and()
-           //запомнили сессию
-           .rememberMe()
-        .and()
-           .logout()
-           .permitAll()
-           .logoutSuccessUrl("/");
+        .formLogin().disable()
+        .httpBasic();
   }
 
-  @Autowired
-  protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-    auth.jdbcAuthentication().dataSource(dataSource)
-        .passwordEncoder(NoOpPasswordEncoder.getInstance())
-        .usersByUsernameQuery("select name, password from users where email = ")
-        .authoritiesByUsernameQuery("select name, is_moderator from user where name = ");
-        //userDetailsService(userService).passwordEncoder(NoOpPasswordEncoder.getInstance());
+  @Bean
+  protected DaoAuthenticationProvider daoAuthenticationProvider() {
+    DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+    daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+    daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+    return daoAuthenticationProvider;
   }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(12);
   }
+
+  @Override
+  @Bean
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
+}
