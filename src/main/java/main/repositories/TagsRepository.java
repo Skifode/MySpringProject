@@ -1,9 +1,9 @@
 package main.repositories;
 
-import main.model.Tags;
+import main.model.Tag;
 import org.springframework.data.repository.CrudRepository;
 
-public interface TagsRepository extends CrudRepository<Tags, Integer> {
+public interface TagsRepository extends CrudRepository<Tag, Integer> {
 
-  Tags findByName(String name);
+  Tag findByName(String name);
 }

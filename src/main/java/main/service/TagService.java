@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import main.api.response.TagListResponse;
 import main.api.response.TagResponse;
-import main.model.Tags;
+import main.model.Tag;
 import main.repositories.PostsRepository;
 import main.repositories.Tag2PostRepository;
 import main.repositories.TagsRepository;
@@ -29,10 +29,10 @@ public class TagService {
     double countOfPosts = postsRepository.count();
 
     AtomicReference<Double> normWeight = new AtomicReference<>((double) 0);
-    Iterable<Tags> tagsList = tagsRepository.findAll();
+    Iterable<Tag> tagsList = tagsRepository.findAll();
 
 
-    for (Tags tag : tagsList
+    for (Tag tag : tagsList
     ) {
       String name = tag.getName();
       double weight = tag2PostRepository.findByTagId(tag.getId()).size()/countOfPosts;

@@ -9,9 +9,16 @@ import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity @Data
-public class CaptchaCodes {
+@Entity @Data @NoArgsConstructor
+public class CaptchaCode {
+  
+  public CaptchaCode(Date time, String code, String secretCode) {
+    this.time = time;
+    this.code = code;
+    this.secretCode = secretCode;
+  }
 
   @Id
   @Column(nullable = false)

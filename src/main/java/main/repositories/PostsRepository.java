@@ -24,14 +24,14 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
 
   @Query(value =
       "SELECT * FROM post where is_active = 1 "
-          + "and moderation_status  = 'ACCEPTED' order by -(select count(*) from post_comments\n"
-          + "where post.id = post_comments.post_id)", nativeQuery = true)
+          + "and moderation_status  = 'ACCEPTED' order by -(select count(*) from post_comment\n"
+          + "where post.id = post_comment.post_id)", nativeQuery = true)
   List<Post> findByPopular(Pageable page);
 
   @Query(value =
       "SELECT * FROM post where is_active = 1 "
-          + "and moderation_status  = 'ACCEPTED' order by (select sum(value = 1) from post_votes\n"
-          + "where post.id = post_votes.post_id) desc", nativeQuery = true)
+          + "and moderation_status  = 'ACCEPTED' order by (select sum(value = 1) from post_vote\n"
+          + "where post.id = post_vote.post_id) desc", nativeQuery = true)
   List<Post> findByBest(Pageable page);
 
   @Query(value = "SELECT * FROM post where is_active = 1 "

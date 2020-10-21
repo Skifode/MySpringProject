@@ -42,7 +42,6 @@ public class Post {
   @Enumerated(value = EnumType.STRING)
   private Status moderationStatus = Status.NEW; //статус модерации, по умолчанию значение "NEW".
 
-  @Column(nullable = true)
   private int moderatorId; //ID пользователя-модератора, принявшего решение, или NULL
 
   @Column(nullable = false, name = "user_id", insertable = false, updatable = false)
@@ -68,20 +67,20 @@ public class Post {
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
-  private Users user;
+  private User user;
   //===================== КОММЕНТЫ ====================
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "post",
       orphanRemoval = true, fetch = FetchType.LAZY)
 
-  private List<PostComments> commentsList = new ArrayList<>();
+  private List<PostComment> commentsList = new ArrayList<>();
 
-  public void addComment(PostComments comment) {
+  public void addComment(PostComment comment) {
     commentsList.add(comment);
     comment.setPostId(this.getId());
   }
 
-  public void removeComment(PostComments comment) {
+  public void removeComment(PostComment comment) {
     commentsList.remove(comment);
     comment.setPost(null);
   }
@@ -91,14 +90,14 @@ public class Post {
   @JoinTable(name = "tag2post",
       joinColumns = @JoinColumn(name = "post_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
-  private Set<Tags> tags = new HashSet<>();
+  private Set<Tag> tags = new HashSet<>();
 
-  public void addTag(Tags tag) {
+  public void addTag(Tag tag) {
     tags.add(tag);
     tag.getPosts().add(this);
   }
 
-  public void removeTag(Tags tag) {
+  public void removeTag(Tag tag) {
     tags.remove(tag);
     tag.getPosts().remove(this);
   }
@@ -107,7 +106,7 @@ public class Post {
 
   @OneToMany(
       mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  private  List<PostVotes> votes = new ArrayList<>();
+  private  List<PostVote> votes = new ArrayList<>();
 
   public long getLikesCount() {
     return votes.stream().filter(vote -> vote.getValue() > 0).count();

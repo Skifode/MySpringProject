@@ -1,8 +1,10 @@
 package main.api.response;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 
-@Data
+@Getter
+@Builder
 public class UserLoginResponse {
 
   private int id;

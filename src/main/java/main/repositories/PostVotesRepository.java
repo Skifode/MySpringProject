@@ -1,8 +1,8 @@
 package main.repositories;
 
-import main.model.PostVotes;
+import main.model.PostVote;
 import org.springframework.data.repository.CrudRepository;
 
-public interface PostVotesRepository extends CrudRepository<PostVotes, Integer> {
+public interface PostVotesRepository extends CrudRepository<PostVote, Integer> {
 
 }

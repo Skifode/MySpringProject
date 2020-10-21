@@ -16,7 +16,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class PostVotes {
+public class PostVote {
 
   @Id
   @Column(nullable = false)
@@ -38,7 +38,7 @@ public class PostVotes {
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
-  private Users user;
+  private User user;
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id")

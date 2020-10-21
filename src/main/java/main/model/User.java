@@ -24,8 +24,8 @@ import main.data.Role;
 
 @Data @Entity @ToString(exclude = {"posts", "comments", "votes"})
 @AllArgsConstructor @NoArgsConstructor
-public class Users { //это тут временно
-  public Users(String email, String password, String name) {
+public class User { //У тестовых пользователей пароль "password" !!!
+  public User(String email, String password, String name) {
     this.isModerator = false;
     this.email = email;
     this.password = password;
@@ -57,10 +57,10 @@ public class Users { //это тут временно
   @Column(nullable = false, columnDefinition = "VARCHAR(255)")
   private String password; //хэш пароля пользователя
 
-  @Column(nullable = true, columnDefinition = "VARCHAR(255)")
+  @Column(columnDefinition = "VARCHAR(255)")
   private String code; //код для восстановления пароля, может быть NULL
 
-  @Column(columnDefinition = "TEXT", nullable = true)
+  @Column(columnDefinition = "TEXT")
   private String photo; //фотография (ссылка на файл), может быть NULL
 
   public Role getRole(){
@@ -74,9 +74,9 @@ public class Users { //это тут временно
 
   @OneToMany(
       mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  private List<PostComments> comments = new ArrayList<>();
+  private List<PostComment> comments = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  private  List<PostVotes> votes = new ArrayList<>();
+  private  List<PostVote> votes = new ArrayList<>();
 }

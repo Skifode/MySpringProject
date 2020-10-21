@@ -15,7 +15,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Tags {
+public class Tag {
 
   @Id
   @Column(nullable = false)

@@ -1,10 +1,10 @@
 package main.repositories;
 
 import java.util.List;
-import main.model.PostComments;
+import main.model.PostComment;
 import org.springframework.data.repository.CrudRepository;
 
-public interface PostCommentsRepository extends CrudRepository<PostComments, Integer> {
+public interface PostCommentsRepository extends CrudRepository<PostComment, Integer> {
 
-  List<PostComments> getByPostId(int id);
+  List<PostComment> getByPostId(int id);
 }

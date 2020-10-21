@@ -1,6 +1,6 @@
 package main.security;
 
-import main.model.Users;
+import main.model.User;
 import main.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    Users user = usersRepository.findByEmail(email);
+    User user = usersRepository.findByEmail(email);
     return SecurityUser.formUser(user);
   }
 }

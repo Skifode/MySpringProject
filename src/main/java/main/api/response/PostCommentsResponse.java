@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import main.model.PostComments;
+import main.model.PostComment;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +17,7 @@ public class PostCommentsResponse {
   private String text;
   private Map<String, Object> user = new HashMap<>();
 
-  public PostCommentsResponse(PostComments comment) {
+  public PostCommentsResponse(PostComment comment) {
     this.id = comment.getId();
     this.timestamp = LocalDate.parse(comment.getTime()
         .toString())
@@ -27,6 +27,6 @@ public class PostCommentsResponse {
     this.text = comment.getText();
     user.put("id", comment.getUser().getId());
     user.put("name", comment.getUser().getName());
-    user.put("photo", "/img/default-1.png");
+    user.put("photo", comment.getUser().getPhoto());
   }
 }

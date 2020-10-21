@@ -3,21 +3,16 @@ package main.controllers;
 import java.security.Principal;
 import main.api.request.LoginRequest;
 import main.api.request.RegisterRequest;
+import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
 import main.api.response.LogoutResponse;
 import main.api.response.RegisterResponse;
-import main.api.response.UserLoginResponse;
-import main.model.Users;
-import main.repositories.UsersRepository;
-import main.service.UsersService;
+import main.service.CaptchaService;
+import main.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,27 +23,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class ApiAuthController {
 
-  private final AuthenticationManager authenticationManager;
-  private final UsersRepository usersRepository;
 
-  @Autowired
-  UsersService usersService;
+  private final CaptchaService captchaService;
+  private final UserService userService;
 
   @Autowired
   public ApiAuthController(
-      AuthenticationManager authenticationManager,
-      UsersRepository usersRepository) {
-    this.authenticationManager = authenticationManager;
-    this.usersRepository = usersRepository;
+      UserService userService,
+      CaptchaService captchaService) {
+    this.userService = userService;
+    this.captchaService = captchaService;
   }
 
   @GetMapping("/check")
   public ResponseEntity<LoginResponse> check(Principal principal) {
     if (principal == null) {
-      return new ResponseEntity<>(new LoginResponse(), HttpStatus.OK);
+      return new ResponseEntity<>(
+          LoginResponse.builder()
+          .result(false)
+          .build(), HttpStatus.OK);
     }
     else {
-      return new ResponseEntity<>(getLoginResponse(principal.getName()), HttpStatus.OK);
+      return new ResponseEntity<>(userService.getLoginResponse(principal.getName()), HttpStatus.OK);
     }
   }
 
@@ -58,39 +54,19 @@ public class ApiAuthController {
       return new ResponseEntity<>(new LogoutResponse(), HttpStatus.OK);
   }
 
-  @PostMapping("/login") //хочу спать. перенесу в сервис
+  @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-
-    Authentication authentication = authenticationManager
-        .authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    User user = (User) authentication.getPrincipal();
-
-    return new ResponseEntity<>(getLoginResponse(user.getUsername()), HttpStatus.OK);
-  }
-
-  private LoginResponse getLoginResponse(String email) { //и это тоже перенесу zzZZzZZZzzzzzzzzzzzz
-    Users currentUser= usersRepository.findByEmail(email);
-
-    UserLoginResponse userLoginResponse = new UserLoginResponse();
-    userLoginResponse.setEmail(currentUser.getEmail());
-    userLoginResponse.setId(currentUser.getId());
-    userLoginResponse.setModeration(currentUser.isModerator());
-    userLoginResponse.setPhoto(currentUser.getPhoto());
-    userLoginResponse.setName((currentUser.getName()));
-
-
-    LoginResponse response= new LoginResponse();
-    response.setResult(true);
-    response.setUserLoginResponse(userLoginResponse);
-    return response;
+    return new ResponseEntity<>(userService.getAuth(request), HttpStatus.OK);
   }
 
   @PostMapping(value = "/register", produces = "application/json")
   public ResponseEntity<RegisterResponse> register(
-      @RequestBody RegisterRequest register) {
-    Users user = new Users(register.getEmail(), register.getPassword(), register.getName());
-    return new ResponseEntity<>(usersService.getResponse(user), HttpStatus.OK);
+      @RequestBody RegisterRequest request) {
+    return new ResponseEntity<>(userService.getRegisterResponse(request), HttpStatus.OK);
+  }
+
+  @GetMapping("/captcha")
+  public ResponseEntity<CaptchaResponse> captcha() {
+    return new ResponseEntity<>(captchaService.getResponse(), HttpStatus.OK);
   }
 }

@@ -1,9 +1,9 @@
-INSERT INTO `tags` (`id`, `name`) VALUES ('1', 'Java');
-INSERT INTO `tags` (`id`, `name`) VALUES ('2', 'php');
-INSERT INTO `tags` (`id`, `name`) VALUES ('3', 'разработка');
-INSERT INTO `tags` (`id`, `name`) VALUES ('4', 'разное');
-INSERT INTO `mydiplomdb`.`tags` (`id`, `name`) VALUES ('5', 'дизайн');
-INSERT INTO `mydiplomdb`.`tags` (`id`, `name`) VALUES ('6', 'JavaScript');
+INSERT INTO `tag` (`id`, `name`) VALUES ('1', 'Java');
+INSERT INTO `tag` (`id`, `name`) VALUES ('2', 'php');
+INSERT INTO `tag` (`id`, `name`) VALUES ('3', 'разработка');
+INSERT INTO `tag` (`id`, `name`) VALUES ('4', 'разное');
+INSERT INTO `tag` (`id`, `name`) VALUES ('5', 'дизайн');
+INSERT INTO `tag` (`id`, `name`) VALUES ('6', 'JavaScript');
 
 INSERT INTO `tag2post` (`id`, `post_id`, `tag_id`) VALUES ('1', '1', '1');
 INSERT INTO `tag2post` (`id`, `post_id`, `tag_id`) VALUES ('2', '2', '1');

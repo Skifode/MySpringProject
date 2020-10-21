@@ -13,7 +13,7 @@ import main.api.response.PostResponse;
 import main.api.response.PostsListResponse;
 import main.api.response.SinglePostResponse;
 import main.model.Post;
-import main.model.PostComments;
+import main.model.PostComment;
 import main.model.Tag2Post;
 import main.repositories.PostCommentsRepository;
 import main.repositories.PostsRepository;
@@ -28,30 +28,34 @@ import org.springframework.stereotype.Service;
 @Service
 public class PostService {
 
-  @Autowired
-  private PostsRepository postsRepository;
+  private final PostsRepository postsRepository;
+  private final PostCommentsRepository commentsRepository;
+  private final Tag2PostRepository tag2PostRepository;
+  private final TagsRepository tagsRepository;
 
   @Autowired
-  private PostCommentsRepository commentsRepository;
-
-  @Autowired
-  private Tag2PostRepository tag2PostRepository;
-
-  @Autowired
-  private TagsRepository tagsRepository;
-
+  public PostService(
+      PostsRepository postsRepository,
+      PostCommentsRepository commentsRepository,
+      Tag2PostRepository tag2PostRepository,
+      TagsRepository tagsRepository) {
+    this.postsRepository = postsRepository;
+    this.commentsRepository = commentsRepository;
+    this.tag2PostRepository = tag2PostRepository;
+    this.tagsRepository = tagsRepository;
+  }
 
   public PostsListResponse getPosts(int offset, int limit, String mode) {
 
     Pageable pageable = PageRequest.of(offset/limit, limit);
-    List<Post> posts = new ArrayList<>();
+    List<Post> posts =  switch (mode) {
+      case "recent" -> postsRepository.findByRecent(pageable);
+      case "popular" -> postsRepository.findByPopular(pageable);
+      case "best" -> postsRepository.findByBest(pageable);
+      case "early" -> postsRepository.findByEarly(pageable);
+      default -> new ArrayList<>();
+    };
 
-    switch (mode) {
-      case "recent" -> posts = postsRepository.findByRecent(pageable);
-      case "popular" -> posts = postsRepository.findByPopular(pageable);
-      case "best" -> posts = postsRepository.findByBest(pageable);
-      case "early" -> posts = postsRepository.findByEarly(pageable);
-    }
     List<PostResponse> postResponses = posts.stream()
         .map(PostResponse::new)
         .collect(Collectors.toList());
@@ -70,9 +74,9 @@ public class PostService {
         new PostResponse(post), post.isActive(), post.getText());
 
     ArrayList<PostCommentsResponse> comments = new ArrayList<>();
-    List<PostComments> commentsList = commentsRepository.getByPostId(post.getId());
+    List<PostComment> commentsList = commentsRepository.getByPostId(post.getId());
     if (commentsList.size() > 0) {
-      for (PostComments com : commentsList) {
+      for (PostComment com : commentsList) {
         comments.add(new PostCommentsResponse(com));
       }
     }

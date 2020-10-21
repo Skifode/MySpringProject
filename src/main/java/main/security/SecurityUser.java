@@ -3,7 +3,7 @@ package main.security;
 import java.util.Collection;
 import java.util.List;
 import lombok.Data;
-import main.model.Users;
+import main.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,7 +50,7 @@ public class SecurityUser implements UserDetails {
     return true;
   }
 
-  public static UserDetails formUser(Users user) {
+  public static UserDetails formUser(User user) {
     return new org.springframework.security.core.userdetails.User(
         user.getEmail(),
         user.getPassword(),
