@@ -103,6 +103,9 @@ public class UserService {
   public void saveUser(String email, String pass, String name) {
     usersRepository.save(new User(email, pass, name));
   }
+  public void saveUser(User user) {
+    usersRepository.save(user);
+  }
 
   public boolean deleteUser(int userId) {
     if (usersRepository.findById(userId).isPresent()) {

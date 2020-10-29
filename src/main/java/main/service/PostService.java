@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.Data;
 import main.api.response.CalendarResponse;
@@ -15,10 +14,12 @@ import main.api.response.SinglePostResponse;
 import main.model.Post;
 import main.model.PostComment;
 import main.model.Tag2Post;
+import main.repositories.CountsPostsByDate;
 import main.repositories.PostCommentsRepository;
 import main.repositories.PostsRepository;
 import main.repositories.Tag2PostRepository;
 import main.repositories.TagsRepository;
+import main.repositories.YearsListForCalendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -144,21 +145,16 @@ public class PostService {
   }
 
   public CalendarResponse getCalendar(int year) {
-    ArrayList<Integer> allYears = new ArrayList<>();
-    Map<String, Integer> posts = new TreeMap<>();
 
-    postsRepository.getPostsGroupByYear().forEach(
-        post -> allYears.add(Integer.parseInt(post
-            .getTime()
-            .toString()
-            .split("-")[0])));
+    List<Integer> allYears = postsRepository
+        .getYears().stream()
+        .map(YearsListForCalendar::getYear)
+        .collect(Collectors.toList());
 
-    postsRepository.getPostsByYear(year).forEach(
-        post -> posts.put(post
-                .getTime()
-                .toString()
-                .substring(0,10),
-            postsRepository.getCountOfPostsByDate(post.getTime())));
+    Map<String, Integer> posts = postsRepository
+        .getCountPostsGroupByDate(year).stream()
+        .collect(Collectors
+            .toMap(CountsPostsByDate::getFormattedDate, CountsPostsByDate::getCount));
 
     return CalendarResponse.builder().years(allYears).posts(posts).build();
   }

@@ -40,21 +40,24 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
       + "order by time desc", nativeQuery = true)
   List<Post> findByTag(Pageable page, @Param(value = "tagId") int tagId);
 
-  @Query(value = "SELECT * FROM post where is_active = 1 "
-      + "and moderation_status = 'ACCEPTED' and year(time) = :year", nativeQuery = true)
-  List<Post> getPostsByYear(int year);
+  @Query(value = "SELECT year(time) as year FROM post group by year(time) order by -year(time)"
+      , nativeQuery = true)
+  List<YearsListForCalendar> getYears();
 
   @Query(value = "SELECT COUNT(*) FROM post as p where is_active = 1 "
       + "and moderation_status = 'ACCEPTED' and date(p.time) = :date", nativeQuery = true)
   int getCountOfPostsByDate(Date date);
 
-  @Query(value = "SELECT * FROM post where is_active = 1 "
-      + "and moderation_status = 'ACCEPTED' group by year(time) order by -time", nativeQuery = true)
-  List<Post> getPostsGroupByYear();
+
+@Query(value = "SELECT time as date, count(time) as count FROM post"
+    + " where is_active = 1 and moderation_status = 'ACCEPTED'"
+    + " and year(time) = :year"
+    + " group by date(time) order by date(time)", nativeQuery = true)
+  List<CountsPostsByDate> getCountPostsGroupByDate(@Param(value = "year") int year);
 
   @Query(value = "select * from post p where is_active = 1 and moderation_status = 'ACCEPTED' "
       + "and p.title like %:query% or p.text like %:query% order by -time", nativeQuery = true)
-  List<Post> findPostsByQuery(Pageable pageable, @Param(value = "query")String query);
+  List<Post> findPostsByQuery(Pageable pageable, @Param(value = "query") String query);
 
   @Query(value = "select count(*) from post p where is_active = 1 and moderation_status = 'ACCEPTED' "
       + "and p.title like %:query% or p.text like %:query% order by -time", nativeQuery = true)

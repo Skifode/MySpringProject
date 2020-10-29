@@ -49,7 +49,7 @@ public class ApiAuthController {
   }
 
   @GetMapping("/logout")
-  public ResponseEntity<LogoutResponse> logout(Principal principal) {
+  public ResponseEntity<LogoutResponse> logout() {
     SecurityContextHolder.clearContext();
       return new ResponseEntity<>(new LogoutResponse(), HttpStatus.OK);
   }
