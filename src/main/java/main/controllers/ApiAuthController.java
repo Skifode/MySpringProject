@@ -37,15 +37,11 @@ public class ApiAuthController {
 
   @GetMapping("/check")
   public ResponseEntity<LoginResponse> check(Principal principal) {
-    if (principal == null) {
-      return new ResponseEntity<>(
-          LoginResponse.builder()
-          .result(false)
-          .build(), HttpStatus.OK);
-    }
-    else {
-      return new ResponseEntity<>(userService.getLoginResponse(principal.getName()), HttpStatus.OK);
-    }
+    LoginResponse loginResponse = principal == null ?
+        LoginResponse.builder().result(false).build() :
+        userService.getLoginResponse(principal.getName());
+
+    return new ResponseEntity<>(loginResponse, HttpStatus.OK);
   }
 
   @GetMapping("/logout")

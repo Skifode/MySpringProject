@@ -18,13 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class StorageService {
 
   @Value("${upload.avatars}")
-  private String AVATARS_UPLOAD_DIRECTORY;
+  private String avatarsUploadDirectory;
 
   final static int TARGET_WIDTH = 36;
   final static int TARGET_HEIGHT = 36;
 
   public String saveAvatar(MultipartFile image) {
-    String filePath = AVATARS_UPLOAD_DIRECTORY + getRandomPath() + image.getOriginalFilename();
+    String filePath = avatarsUploadDirectory + getRandomPath() + image.getOriginalFilename();
 
     if (new File(filePath).mkdirs() || !new File(filePath).exists()) {
       try {

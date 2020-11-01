@@ -1,5 +1,6 @@
 package main.services;
 
+import java.util.Objects;
 import java.util.TreeMap;
 import main.api.request.ProfileSettingsRequest;
 import main.api.response.RegisterResponse;
@@ -33,10 +34,15 @@ public class ProfileSettingsService {
         if (request.getPhoto() != null) {
           if (request.getPhoto().toString().isBlank()) {
             user.setPhoto("");
-          } else if (((MultipartFile) request.getPhoto()).getBytes().length < 5242880) {
+          } else if (((MultipartFile) request.getPhoto()).getBytes().length < 5242880 &&
+              Objects.requireNonNull(((MultipartFile)
+                  request.getPhoto())
+                  .getContentType())
+                  .contains("image")) {
             user.setPhoto(storageService.saveAvatar((MultipartFile) request.getPhoto()));
           } else {
-            errorsMap.put("photo", "Фото слишком большое, нужно не более 5 Мб");
+            errorsMap.put("photo", "Загрузите фотографию в формате JPG, BMP, JPEG, WBMP, PNG, GIF"
+                + " с размером не более 5 Мб");
           }
         }
         if (request.getEmail() != null) {
