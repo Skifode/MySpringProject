@@ -26,6 +26,8 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
 import main.data.Status;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Data @Entity
 public class Post {
@@ -72,7 +74,7 @@ public class Post {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "post",
       orphanRemoval = true, fetch = FetchType.LAZY)
-
+  @LazyCollection(LazyCollectionOption.EXTRA)
   private List<PostComment> commentsList = new ArrayList<>();
 
   public void addComment(PostComment comment) {

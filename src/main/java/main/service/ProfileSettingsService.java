@@ -1,5 +1,6 @@
 package main.service;
 
+import java.util.TreeMap;
 import main.api.request.ProfileSettingsRequest;
 import main.api.response.RegisterResponse;
 import main.model.User;
@@ -23,33 +24,53 @@ public class ProfileSettingsService {
   }
 
   public RegisterResponse editProfile(ProfileSettingsRequest request, String email) {
+    TreeMap<String, String> errorsMap = new TreeMap<>();
 
-    if (usersRepository.existsByEmail(email)) {
-      User user = usersRepository.findByEmail(email);
+    try {
+      if (usersRepository.existsByEmail(email)) {
+        User user = usersRepository.findByEmail(email);
 
-      if (request.getPhoto() != null) {
-        if (request.getPhoto().toString().isBlank()) {
+        if (request.getPhoto() != null) {
+          if (request.getPhoto().toString().isBlank()) {
+            user.setPhoto("");
+          } else if (((MultipartFile) request.getPhoto()).getBytes().length < 5242880) {
+            user.setPhoto(storageService.saveAvatar((MultipartFile) request.getPhoto()));
+          } else {
+            errorsMap.put("photo", "Фото слишком большое, нужно не более 5 Мб");
+          }
+        }
+        if (request.getEmail() != null) {
+          if (usersRepository.existsByEmail(request.getEmail())) {
+            errorsMap.put("email", "Этот e-mail уже зарегистрирован");
+          } else {
+            user.setEmail(request.getEmail());
+          }
+        }
+        if (request.getName() != null) {
+          if (request.getName().toLowerCase().contains("admin")) {
+            errorsMap.put("name", "Имя указано неверно");
+          } else {
+            user.setName(request.getName());
+          }
+        }
+        if (request.getPassword() != null) {
+          if (request.getPassword().length() < 6) {
+            errorsMap.put("password", "Пароль короче 6-ти символов");
+          } else {
+            user.setPassword(new BCryptPasswordEncoder(12).encode(request.getPassword()));
+          }
+        }
+        if (request.isRemovePhoto()) {
           user.setPhoto("");
-        } else {
-          user.setPhoto(storageService.saveImage((MultipartFile) request.getPhoto()));
+        }
+        if (errorsMap.isEmpty()) {
+          usersRepository.save(user);
+          return RegisterResponse.builder().result(true).build();
         }
       }
-      if (request.getEmail() != null) {
-        user.setEmail(request.getEmail());
-      }
-      if (request.getName() != null) {
-        user.setName(request.getName());
-      }
-      if (request.getPassword() != null) {
-        user.setPassword(new BCryptPasswordEncoder(12).encode(request.getPassword()));
-      }
-      if (request.isRemovePhoto()) {
-        user.setPhoto("");
-      }
-
-      usersRepository.save(user);
+    } catch (Exception ex) {
+      ex.printStackTrace();
     }
-
-    return RegisterResponse.builder().result(true).build();
+    return RegisterResponse.builder().result(false).errors(errorsMap).build();
   }
 }
