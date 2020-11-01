@@ -1,4 +1,4 @@
-package main.service;
+package main.services;
 
 import java.util.TreeMap;
 import main.api.request.LoginRequest;

@@ -3,7 +3,7 @@ package main.controllers;
 import java.util.Date;
 import main.api.response.PostsListResponse;
 import main.api.response.SinglePostResponse;
-import main.service.PostService;
+import main.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -17,10 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ApiPostController {
 
-  @Autowired
-  private PostService postService;
+  private final PostService postService;
 
- // @PreAuthorize("hasAuthority('user:write')")
+  @Autowired
+  public ApiPostController(PostService postService) {
+    this.postService = postService;
+  }
+
   @GetMapping("/api/post") public ResponseEntity<PostsListResponse> getPosts(
       @RequestParam(defaultValue = "0") int offset,
       @RequestParam(defaultValue = "10") int limit,

@@ -15,6 +15,9 @@ spring.resources.static-locations: classpath:/static, classpath:/images
 upload.avatars: src/main/resources/images/avatars
 upload.posts: src/main/resources/images/posts
 
+settings.positive: 'YES'
+captcha.response.attribute: data:image/png;base64,
+
 blog.title: DevPub
 blog.subtitle: Рассказы разработчиков
 blog.phone: +7 903 666-44-55

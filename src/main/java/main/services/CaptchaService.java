@@ -1,4 +1,4 @@
-package main.service;
+package main.services;
 
 import com.github.cage.Cage;
 import java.util.Base64;
@@ -7,6 +7,7 @@ import main.api.response.CaptchaResponse;
 import main.model.CaptchaCode;
 import main.repositories.CaptchaCodesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Service;
 @Service @EnableScheduling
 public class CaptchaService {
 
-  private static final String ATTRIBUTE = "data:image/png;base64, ";
+  @Value("${captcha.response.attribute}")
+  private String ATTRIBUTE;
 
     private final CaptchaCodesRepository codesRepository;
 

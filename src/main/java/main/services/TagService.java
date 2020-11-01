@@ -1,4 +1,4 @@
-package main.service;
+package main.services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +15,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class TagService {
 
-  @Autowired
-  private TagsRepository tagsRepository;
+  private final TagsRepository tagsRepository;
+  private final PostsRepository postsRepository;
+  private final Tag2PostRepository tag2PostRepository;
 
   @Autowired
-  private PostsRepository postsRepository;
-
-  @Autowired
-  private Tag2PostRepository tag2PostRepository;
+  public TagService(TagsRepository tagsRepository, PostsRepository postsRepository,
+      Tag2PostRepository tag2PostRepository) {
+    this.tagsRepository = tagsRepository;
+    this.postsRepository = postsRepository;
+    this.tag2PostRepository = tag2PostRepository;
+  }
 
   public TagListResponse getTagList() {
     List<TagResponse> response = new ArrayList<>();
