@@ -25,7 +25,7 @@ public class StorageService {
   public String saveAvatar(MultipartFile image) {
     String filePath = AVATARS_UPLOAD_DIRECTORY + getRandomPath() + image.getOriginalFilename();
 
-    if (new File(filePath).mkdirs()) {
+    if (new File(filePath).mkdirs() || !new File(filePath).exists()) {
       try {
         ImageIO.write(
             resizeImage(ImageIO.read(image.getInputStream())),
