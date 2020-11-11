@@ -6,7 +6,7 @@ import main.api.request.RegisterRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
 import main.api.response.LogoutResponse;
-import main.api.response.RegisterResponse;
+import main.api.response.ResultErrorsResponse;
 import main.services.CaptchaService;
 import main.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class ApiAuthController {
   }
 
   @PostMapping(value = "/register", produces = "application/json")
-  public ResponseEntity<RegisterResponse> register(
+  public ResponseEntity<ResultErrorsResponse> register(
       @RequestBody RegisterRequest request) {
     return new ResponseEntity<>(userService.getRegisterResponse(request), HttpStatus.OK);
   }

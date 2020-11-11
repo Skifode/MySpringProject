@@ -40,7 +40,7 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
       + "order by time desc", nativeQuery = true)
   List<Post> findByTag(Pageable page, @Param(value = "tagId") int tagId);
 
-  @Query(value = "SELECT year(time) as year FROM post group by year(time) order by -year(time)"
+  @Query(value = "SELECT year(time) as years2calendar FROM post group by year(time) order by -year(time)"
       , nativeQuery = true)
   List<YearsListForCalendar> getYears();
 

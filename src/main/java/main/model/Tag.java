@@ -12,10 +12,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Data
+@Data @NoArgsConstructor
 public class Tag {
+
+  public Tag(String name) {
+    this.name = name;
+  }
 
   @Id
   @Column(nullable = false)

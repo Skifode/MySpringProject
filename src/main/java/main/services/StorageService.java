@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 import javax.imageio.ImageIO;
+import main.data.UploadType;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
@@ -14,29 +15,51 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service @Component
+@Service
+@Component
 public class StorageService {
 
   @Value("${upload.avatars}")
   private String avatarsUploadDirectory;
 
-  final static int TARGET_WIDTH = 36;
-  final static int TARGET_HEIGHT = 36;
+  @Value("${upload.image}")
+  private String imageUploadDirectory;
 
-  public String saveAvatar(MultipartFile image) {
-    String filePath = avatarsUploadDirectory + getRandomPath() + image.getOriginalFilename();
+  @Value("${avatar.width}")
+  private int targetWidth;
+
+  @Value("${avatar.height}")
+  private int targetHeight;
+
+  public String saveImage(MultipartFile image, UploadType type) throws IOException {
+
+    String contentType = Objects
+        .requireNonNull(image.getContentType())
+        .toLowerCase()
+        .split("/")[1]; // ex: image/jpg
+
+    System.out.println(contentType);
+
+    if (!contentType.contains("jpg") &&
+        !contentType.contains("jpeg") ||
+        image.getBytes().length > 5242880) {
+      throw new IOException("Загрузите фотографию в формате JPG или JPEG"
+          + " с размером не более 5 Мб");
+    }
+
+    String filePath = switch (type) {
+      case IMAGE -> imageUploadDirectory + getRandomPath() + image.getOriginalFilename();
+      case AVATAR -> avatarsUploadDirectory + getRandomPath() + image.getOriginalFilename();
+    };
+    BufferedImage bufferedImage = switch (type) {
+      case AVATAR -> resizeImage(ImageIO.read(image.getInputStream()));
+      case IMAGE -> ImageIO.read(image.getInputStream());
+    };
 
     if (new File(filePath).mkdirs() || !new File(filePath).exists()) {
-      try {
-        ImageIO.write(
-            resizeImage(ImageIO.read(image.getInputStream())),
-            Objects.requireNonNull(image.getContentType()).split("/")[1], // ex: image/jpg
-            new File(filePath));
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
+      ImageIO.write(bufferedImage, contentType, new File(filePath));
     } else {
-      return saveAvatar(image);
+      return saveImage(image, type);
     }
     return filePath.split("/images")[1];
   }
@@ -51,6 +74,6 @@ public class StorageService {
       BufferedImage originalImage) {
     return Scalr.resize(
         originalImage, Method.ULTRA_QUALITY, Mode.AUTOMATIC,
-        TARGET_WIDTH, TARGET_HEIGHT, Scalr.OP_ANTIALIAS);
+        targetWidth, targetHeight, Scalr.OP_ANTIALIAS);
   }
 }

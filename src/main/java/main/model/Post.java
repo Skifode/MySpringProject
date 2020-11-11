@@ -1,6 +1,5 @@
 package main.model;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -22,9 +21,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Setter;
 import main.data.Status;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -46,11 +43,11 @@ public class Post {
 
   private int moderatorId; //ID пользователя-модератора, принявшего решение, или NULL
 
-  @Column(nullable = false, name = "user_id", insertable = false, updatable = false)
+  @Column(nullable = false, name = "user_id")
   private int userId; //автор поста
 
   @Column(nullable = false, columnDefinition = "DATETIME")
-  @Setter(AccessLevel.NONE)
+  //@Setter(AccessLevel.NONE)
   @Temporal(TemporalType.DATE)
   private Date time; //дата и время публикации поста
 
@@ -63,12 +60,8 @@ public class Post {
   @Column(nullable = false)
   private int viewCount; //количество просмотров поста
 
-  public void setDate(String stringDate) {
-    this.time = Date.from(Timestamp.valueOf(stringDate).toInstant());
-  }
-
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "user_id", insertable = false, updatable = false)
   private User user;
   //===================== КОММЕНТЫ ====================
 
@@ -79,12 +72,10 @@ public class Post {
 
   public void addComment(PostComment comment) {
     commentsList.add(comment);
-    comment.setPostId(this.getId());
   }
 
   public void removeComment(PostComment comment) {
     commentsList.remove(comment);
-    comment.setPost(null);
   }
   //======================= ТЭГИ ====================
 
@@ -96,12 +87,10 @@ public class Post {
 
   public void addTag(Tag tag) {
     tags.add(tag);
-    tag.getPosts().add(this);
   }
 
   public void removeTag(Tag tag) {
     tags.remove(tag);
-    tag.getPosts().remove(this);
   }
 
   //====================== ЛАЙКИ ====================

@@ -13,7 +13,10 @@ spring.servlet.multipart.max-request-size: 25MB
 spring.resources.static-locations: classpath:/static, classpath:/images
 
 upload.avatars: src/main/resources/images/avatars
-upload.posts: src/main/resources/images/posts
+upload.image: src/main/resources/images/posts
+
+avatar.height: 36
+avatar.width: 36
 
 settings.positive: 'YES'
 captcha.response.attribute: data:image/png;base64,

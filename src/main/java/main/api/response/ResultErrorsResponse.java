@@ -7,8 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter @Builder @JsonInclude(Include.NON_NULL)
-public class RegisterResponse {
+public class ResultErrorsResponse {
 
+  private final String successAnswer;
+  private final int id;
   private final boolean result;
   private final Map<String, String> errors;
 }

@@ -3,12 +3,13 @@ package main.controllers;
 import java.security.Principal;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import main.api.request.AddCommentRequest;
 import main.api.request.ProfileSettingsRequest;
 import main.api.response.CalendarResponse;
 import main.api.response.InitResponse;
-import main.api.response.RegisterResponse;
 import main.api.response.SettingsResponse;
 import main.api.response.TagListResponse;
+import main.services.PostCommentService;
 import main.services.PostService;
 import main.services.ProfileSettingsService;
 import main.services.SettingsService;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class ApiGeneralController {
@@ -32,16 +34,20 @@ public class ApiGeneralController {
   private final TagService tagService;
   private final PostService postService;
   private final ProfileSettingsService profileSettingsService;
+  private final PostCommentService postCommentService;
 
 
   @Autowired
   public ApiGeneralController(InitResponse initResponseInfo, SettingsService settings,
-      TagService tagService, PostService postService, ProfileSettingsService profileSettingsService) {
+      TagService tagService, PostService postService,
+      ProfileSettingsService profileSettingsService,
+      PostCommentService postCommentService) {
     this.initResponseInfo = initResponseInfo;
     this.settings = settings;
     this.tagService = tagService;
     this.postService = postService;
     this.profileSettingsService = profileSettingsService;
+    this.postCommentService = postCommentService;
   }
 
   @GetMapping("/api/init")
@@ -63,21 +69,34 @@ public class ApiGeneralController {
   public ResponseEntity<CalendarResponse> calendar(
       @RequestParam(name = "year", defaultValue = "0") Integer year) {
     return new ResponseEntity<>(
-        postService.getCalendar(year!=0 ?
+        postService.getCalendar(year != 0 ?
             year : new GregorianCalendar().get(Calendar.YEAR)), HttpStatus.OK);
   }
 
   @PreAuthorize("hasAuthority('user:write')")
   @PostMapping(value = "/api/profile/my", consumes = "multipart/form-data")
-  public ResponseEntity<RegisterResponse> multipartProfileChanges(
+  public ResponseEntity<?> multipartProfileChanges(
       @ModelAttribute ProfileSettingsRequest request, Principal principal) {
-    return new ResponseEntity<>(profileSettingsService.editProfile(request, principal.getName()), HttpStatus.OK);
+    return profileSettingsService.editProfile(request, principal.getName());
   }
 
   @PreAuthorize("hasAuthority('user:write')")
   @PostMapping(value = "/api/profile/my", consumes = "application/json")
-  public ResponseEntity<RegisterResponse> otherProfileChanges(
+  public ResponseEntity<?> otherProfileChanges(
       @RequestBody ProfileSettingsRequest request, Principal principal) {
-    return new ResponseEntity<>(profileSettingsService.editProfile(request, principal.getName()), HttpStatus.OK);
+    return profileSettingsService.editProfile(request, principal.getName());
+  }
+
+  @PreAuthorize("hasAuthority('user:write')")
+  @PostMapping(value = "/api/image", consumes = "multipart/form-data")
+  public ResponseEntity<?> uploadImage(
+      @RequestParam(name = "image") MultipartFile image ) {
+    return postService.uploadImage2Post(image);
+  }
+
+  @PreAuthorize("hasAuthority('user:write')")
+  @PostMapping(value = "/api/comment", consumes = "application/json")
+  public ResponseEntity<?> addComment(@RequestBody AddCommentRequest request, Principal principal) {
+    return postCommentService.addComment(request, principal.getName());
   }
 }

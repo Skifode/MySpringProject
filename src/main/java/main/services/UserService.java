@@ -4,7 +4,7 @@ import java.util.TreeMap;
 import main.api.request.LoginRequest;
 import main.api.request.RegisterRequest;
 import main.api.response.LoginResponse;
-import main.api.response.RegisterResponse;
+import main.api.response.ResultErrorsResponse;
 import main.api.response.UserLoginResponse;
 import main.model.User;
 import main.repositories.CaptchaCodesRepository;
@@ -68,7 +68,7 @@ public class UserService {
         .build();
   }
 
-  public RegisterResponse getRegisterResponse(RegisterRequest request) {
+  public ResultErrorsResponse getRegisterResponse(RegisterRequest request) {
 
     String email = request.getEmail().trim();
     String pass = new BCryptPasswordEncoder(12).encode(request.getPassword().trim());
@@ -94,9 +94,9 @@ public class UserService {
       errorsMap.put("email", "e-mail " + email + " уже зарегистрирован");
     }
     if (errorsMap.isEmpty()) { saveUser(email, pass, name);
-      return RegisterResponse.builder().result(true).build();
+      return ResultErrorsResponse.builder().result(true).build();
     } else {
-      return RegisterResponse.builder().result(false).errors(errorsMap).build();
+      return ResultErrorsResponse.builder().result(false).errors(errorsMap).build();
     }
   }
 
