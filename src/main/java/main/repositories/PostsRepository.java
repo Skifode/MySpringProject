@@ -49,18 +49,110 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
   int getCountOfPostsByDate(Date date);
 
 
-@Query(value = "SELECT time as date, count(time) as count FROM post"
-    + " where is_active = 1 and moderation_status = 'ACCEPTED'"
-    + " and year(time) = :year"
-    + " group by date(time) order by date(time)", nativeQuery = true)
+  @Query(value = "SELECT time as date, count(time) as count FROM post"
+      + " where is_active = 1 and moderation_status = 'ACCEPTED'"
+      + " and year(time) = :year"
+      + " group by date(time) order by date(time)", nativeQuery = true)
   List<CountsPostsByDate> getCountPostsGroupByDate(@Param(value = "year") int year);
 
-  @Query(value = "select * from post p where is_active = 1 and moderation_status = 'ACCEPTED' "
+  @Query(value = "select * from post p where is_active = 1"
+      + " and moderation_status = 'ACCEPTED' "
       + "and p.title like %:query% or p.text like %:query% order by -time", nativeQuery = true)
   List<Post> findPostsByQuery(Pageable pageable, @Param(value = "query") String query);
 
-  @Query(value = "select count(*) from post p where is_active = 1 and moderation_status = 'ACCEPTED' "
+  @Query(value = "select count(*) from post p where is_active = 1"
+      + " and moderation_status = 'ACCEPTED' "
       + "and p.title like %:query% or p.text like %:query% order by -time", nativeQuery = true)
   int getCountOfPostsByQuery(String query);
 
+  @Query(value = "select count(*) from post where is_active = 1"
+      + " and moderation_status = 'ACCEPTED'"
+      , nativeQuery = true)
+  int getPosts2ShowCount();
+
+  @Query(value = "select count(*) from post where is_active = 1"
+      + " and moderation_status = 'NEW'"
+      , nativeQuery = true)
+  int getNewPostsCount();
+
+  @Query(value = "select count(*) from post where is_active = 1"
+      + " and moderation_status = 'DECLINED'"
+      + " and moderator_id = :moderator_id"
+      , nativeQuery = true)
+  int getMyDeclinedCount(@Param(value = "moderator_id") int moderator_id);
+
+  @Query(value = "select count(*) from post where is_active = 1"
+      + " and moderation_status = 'ACCEPTED'"
+      + " and moderator_id = :moderator_id"
+      , nativeQuery = true)
+  int getMyAcceptedCount(@Param(value = "moderator_id") int moderator_id);
+
+  @Query(value =
+      "SELECT * FROM post where is_active = 1 "
+          + "and moderation_status = 'NEW' order by -time", nativeQuery = true)
+  List<Post> getPosts2Moderate(Pageable page);
+
+  @Query(value =
+      "SELECT * FROM post where is_active = 1 "
+          + "and moderation_status = 'DECLINED'"
+          + " and moderator_id = :moderator_id"
+          + " order by -time", nativeQuery = true)
+  List<Post> getDeclinedPosts(@Param(value = "moderator_id") int moderator_id, Pageable page);
+
+  @Query(value =
+      "SELECT * FROM post where is_active = 1 "
+          + "and moderation_status = 'ACCEPTED'"
+          + " and moderator_id = :moderator_id"
+          + " order by -time", nativeQuery = true)
+  List<Post> getAcceptedPosts(@Param(value = "moderator_id") int moderator_id, Pageable page);
+
+  @Query(value =
+      "SELECT * FROM post where is_active = 0"
+          + " and user_id = :user_id"
+          + " order by -time", nativeQuery = true)
+  List<Post> getMyInactivePosts(@Param(value = "user_id") int userId, Pageable pageable);
+
+  @Query(value =
+      "SELECT count(*) FROM post where is_active = 0"
+          + " and user_id = :user_id", nativeQuery = true)
+  int getMyInactivePostsCount(@Param(value = "user_id") int userId);
+
+  @Query(value =
+      "SELECT * FROM post where is_active = 1 "
+          + "and moderation_status = 'NEW'"
+          + " and user_id = :user_id"
+          + " order by -time", nativeQuery = true)
+  List<Post> getMyNotAcceptedPosts(@Param(value = "user_id") int userId, Pageable pageable);
+
+  @Query(value =
+      "SELECT count(*) FROM post where is_active = 1 "
+          + "and moderation_status = 'NEW'"
+          + " and user_id = :user_id", nativeQuery = true)
+  int getMyNotAcceptedPostsCount(@Param(value = "user_id") int userId);
+
+  @Query(value =
+      "SELECT * FROM post where is_active = 1 "
+          + "and moderation_status = 'DECLINED'"
+          + " and user_id = :user_id"
+          + " order by -time", nativeQuery = true)
+  List<Post> getMyDeclinedPosts(@Param(value = "user_id") int userId, Pageable pageable);
+
+  @Query(value =
+      "SELECT count(*) FROM post where is_active = 1 "
+          + "and moderation_status = 'DECLINED'"
+          + " and user_id = :user_id", nativeQuery = true)
+  int getMyDeclinedPostsCount(@Param(value = "user_id") int userId);
+
+  @Query(value =
+      "SELECT * FROM post where is_active = 1 "
+          + "and moderation_status = 'ACCEPTED'"
+          + " and user_id = :user_id"
+          + " order by -time", nativeQuery = true)
+  List<Post> getMyAcceptedPosts(@Param(value = "user_id") int userId, Pageable pageable);
+
+  @Query(value =
+      "SELECT count(*) FROM post where is_active = 1 "
+          + "and moderation_status = 'ACCEPTED'"
+          + " and user_id = :user_id", nativeQuery = true)
+  int getMyAcceptedPostsCount(@Param(value = "user_id") int userId);
 }

@@ -16,13 +16,16 @@ import main.api.response.PostResponse;
 import main.api.response.PostsListResponse;
 import main.api.response.ResultErrorsResponse;
 import main.api.response.SinglePostResponse;
+import main.data.Status;
 import main.data.UploadType;
 import main.model.Post;
 import main.model.PostComment;
+import main.model.PostVote;
 import main.model.Tag;
 import main.model.Tag2Post;
 import main.repositories.CountsPostsByDate;
 import main.repositories.PostCommentsRepository;
+import main.repositories.PostVotesRepository;
 import main.repositories.PostsRepository;
 import main.repositories.Tag2PostRepository;
 import main.repositories.TagsRepository;
@@ -46,6 +49,7 @@ public class PostService {
   private final TagsRepository tagsRepository;
   private final UsersRepository usersRepository;
   private final StorageService storageService;
+  private final PostVotesRepository postVotesRepository;
 
   @Autowired
   public PostService(
@@ -54,16 +58,18 @@ public class PostService {
       Tag2PostRepository tag2PostRepository,
       TagsRepository tagsRepository,
       UsersRepository usersRepository,
-      StorageService storageService) {
+      StorageService storageService,
+      PostVotesRepository postVotesRepository) {
     this.postsRepository = postsRepository;
     this.commentsRepository = commentsRepository;
     this.tag2PostRepository = tag2PostRepository;
     this.tagsRepository = tagsRepository;
     this.usersRepository = usersRepository;
     this.storageService = storageService;
+    this.postVotesRepository = postVotesRepository;
   }
 
-  public PostsListResponse getPosts(int offset, int limit, String mode) {
+  public ResponseEntity<?> getPosts(int offset, int limit, String mode) {
 
     Pageable pageable = PageRequest.of(offset / limit, limit);
     List<Post> posts = switch (mode) {
@@ -78,10 +84,10 @@ public class PostService {
         .map(PostResponse::new)
         .collect(Collectors.toList());
 
-    return PostsListResponse.builder()
+    return new ResponseEntity<>(PostsListResponse.builder()
         .posts(postResponses)
-        .count(postsRepository.count())
-        .build();
+        .count(postsRepository.getPosts2ShowCount())
+        .build(), HttpStatus.OK);
   }
 
   public SinglePostResponse getPostById(int id) { //ужс. переделаю
@@ -235,5 +241,107 @@ public class PostService {
         .result(false)
         .errors(errors)
         .build(), HttpStatus.BAD_REQUEST);
+  }
+
+  public ResponseEntity<?> posts2moderate(int offset, int limit, String status, String email) {
+    int moderator_id = usersRepository.findByEmail(email).getId();
+    Pageable pageable = PageRequest.of(offset / limit, limit);
+
+    int count = switch (status) {
+      case "new" -> postsRepository.getNewPostsCount();
+      case "declined" -> postsRepository.getMyDeclinedCount(moderator_id);
+      case "accepted" -> postsRepository.getMyAcceptedCount(moderator_id);
+      default -> 0;
+    };
+
+    List<Post> posts = switch (status) {
+      case "new" -> postsRepository.getPosts2Moderate(pageable);
+      case "declined" -> postsRepository.getDeclinedPosts(moderator_id, pageable);
+      case "accepted" -> postsRepository.getAcceptedPosts(moderator_id, pageable);
+      default -> new ArrayList<>();
+    };
+
+    List<PostResponse> postResponses = posts.stream()
+        .map(PostResponse::new)
+        .collect(Collectors.toList());
+
+    return new ResponseEntity<>(PostsListResponse.builder()
+        .posts(postResponses)
+        .count(count)
+        .build(), HttpStatus.OK);
+  }
+
+  public ResponseEntity<?> setModerationStatus(String decision, int postId, String email) {
+    int moderId = usersRepository.findByEmail(email).getId();
+    switch (decision) {
+      case "accept" -> postsRepository.findById(postId)
+          .ifPresent(p -> {
+            p.setModerationStatus(Status.ACCEPTED);
+            p.setModeratorId(moderId);
+            postsRepository.save(p);
+          });
+      case "decline" -> postsRepository.findById(postId)
+          .ifPresent(p -> {
+            p.setModerationStatus(Status.DECLINED);
+            p.setModeratorId(moderId);
+            postsRepository.save(p);
+          });
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  public ResponseEntity<?> setLike(int postId, String email, byte value) {
+    int userId = usersRepository.findByEmail(email).getId();
+    PostVote postVote = postVotesRepository
+        .findByUserIdAndPostId(userId, postId)
+        .orElse(new PostVote());
+    boolean result = postVote.getValue() != value;
+
+    if (result) {
+      postVote.setTime(new Date());
+      postVote.setPostId(postId);
+      postVote.setValue(value);
+      postVote.setUserId(userId);
+      postVotesRepository.save(postVote);
+    }
+    return new ResponseEntity<>(ResultErrorsResponse
+        .builder()
+        .result(result)
+        .build(), HttpStatus.OK);
+  }
+
+  public ResponseEntity<?> getMyPosts(int offset, int limit, String status, String email) {
+    int userId = usersRepository.findByEmail(email).getId();
+    Pageable pageable = PageRequest.of(offset / limit, limit);
+
+    List<Post> posts = switch (status) {
+      case "inactive" -> postsRepository.getMyInactivePosts(userId, pageable);
+      case "pending" -> postsRepository.getMyNotAcceptedPosts(userId, pageable);
+      case "declined" -> postsRepository.getMyDeclinedPosts(userId, pageable);
+      case "published" -> postsRepository.getMyAcceptedPosts(userId, pageable);
+      default -> new ArrayList<>();
+    };
+
+    int count = switch (status) {
+      case "inactive" -> postsRepository.getMyInactivePostsCount(userId);
+      case "pending" -> postsRepository.getMyNotAcceptedPostsCount(userId);
+      case "declined" -> postsRepository.getMyDeclinedPostsCount(userId);
+      case "published" -> postsRepository.getMyAcceptedPostsCount(userId);
+      default -> 0;
+    };
+
+    List<PostResponse> postResponses = posts.stream()
+        .map(PostResponse::new)
+        .collect(Collectors.toList());
+
+    return new ResponseEntity<>(PostsListResponse.builder()
+        .posts(postResponses)
+        .count(count)
+        .build(), HttpStatus.OK);
+  }
+
+  public ResponseEntity<?> putNewPost(AddPostRequest request, String name, int id) {
+// спаааааааааааать
+    return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
   }
 }

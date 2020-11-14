@@ -23,10 +23,10 @@ public class PostVote {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id; //id лайка/дизлайка
 
-  @Column(nullable = false, name = "user_id", insertable=false, updatable=false)
+  @Column(nullable = false, name = "user_id")
   private int userId; //тот, кто поставил лайк / дизлайк
 
-  @Column(nullable = false, name = "post_id", insertable=false, updatable=false)
+  @Column(nullable = false, name = "post_id")
   private int postId; //пост, которому поставлен лайк / дизлайк
 
   @Column(nullable = false, columnDefinition = "DATETIME")
@@ -37,11 +37,11 @@ public class PostVote {
   private byte value; //лайк или дизлайк: 1 или -1
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "user_id", insertable=false, updatable=false)
   private User user;
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "post_id")
+  @JoinColumn(name = "post_id", insertable=false, updatable=false)
   private Post post;
 
 }

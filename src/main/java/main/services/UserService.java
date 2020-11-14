@@ -8,6 +8,7 @@ import main.api.response.ResultErrorsResponse;
 import main.api.response.UserLoginResponse;
 import main.model.User;
 import main.repositories.CaptchaCodesRepository;
+import main.repositories.PostsRepository;
 import main.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,15 +24,18 @@ public class UserService {
   private final UsersRepository usersRepository;
   private final CaptchaCodesRepository captchaCodesRepository;
   private final AuthenticationManager authenticationManager;
+  private final PostsRepository postsRepository;
 
   @Autowired
   public UserService(
       AuthenticationManager authenticationManager,
       UsersRepository usersRepository,
-      CaptchaCodesRepository captchaCodesRepository) {
+      CaptchaCodesRepository captchaCodesRepository,
+      PostsRepository postsRepository) {
     this.authenticationManager = authenticationManager;
     this.usersRepository = usersRepository;
     this.captchaCodesRepository = captchaCodesRepository;
+    this.postsRepository = postsRepository;
   }
 
   public LoginResponse getAuth(LoginRequest request) {
@@ -55,11 +59,13 @@ public class UserService {
 
   public LoginResponse getLoginResponse(String email) {
     User currentUser = usersRepository.findByEmail(email);
+    int count = currentUser.isModerator() ? postsRepository.getNewPostsCount() : 0;
 
     UserLoginResponse userLoginResponse = UserLoginResponse.builder()
         .email(currentUser.getEmail())
         .id(currentUser.getId())
         .moderation(currentUser.isModerator())
+        .moderationCount(count)
         .photo(currentUser.getPhoto())
         .name(currentUser.getName()).build();
     return LoginResponse.builder()

@@ -10,7 +10,7 @@ import lombok.Getter;
 public class ResultErrorsResponse {
 
   private final String successAnswer;
-  private final int id;
+  private final Integer id;
   private final boolean result;
   private final Map<String, String> errors;
 }

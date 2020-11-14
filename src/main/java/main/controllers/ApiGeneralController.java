@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import main.api.request.AddCommentRequest;
+import main.api.request.ModerationStatusRequest;
 import main.api.request.ProfileSettingsRequest;
 import main.api.response.CalendarResponse;
 import main.api.response.InitResponse;
@@ -98,5 +99,14 @@ public class ApiGeneralController {
   @PostMapping(value = "/api/comment", consumes = "application/json")
   public ResponseEntity<?> addComment(@RequestBody AddCommentRequest request, Principal principal) {
     return postCommentService.addComment(request, principal.getName());
+  }
+
+  @PreAuthorize("hasAuthority('user:moderate')")
+  @PostMapping(value = "/api/moderation", consumes = "application/json")
+  public ResponseEntity<?> setModerationStatus(
+      @RequestBody ModerationStatusRequest request,
+      Principal principal) {
+    return postService.setModerationStatus(
+        request.getDecision(), request.getPostId(), principal.getName());
   }
 }
