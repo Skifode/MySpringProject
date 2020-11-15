@@ -29,28 +29,26 @@ public class TagService {
 
   public TagListResponse getTagList() {
     List<TagResponse> response = new ArrayList<>();
-    double countOfPosts = postsRepository.count();
+    double countOfPosts = postsRepository.getPosts2ShowCount();
 
     AtomicReference<Double> normWeight = new AtomicReference<>((double) 0);
-    Iterable<Tag> tagsList = tagsRepository.findAll();
-
+    Iterable<Tag> tagsList = tagsRepository.findAllAccepted();
 
     for (Tag tag : tagsList
     ) {
       String name = tag.getName();
-      double weight = tag2PostRepository.findByTagId(tag.getId()).size()/countOfPosts;
+      double weight = tag2PostRepository.findByTagId(tag.getId()).size() / countOfPosts;
 
-      if (weight>normWeight.get()) {
+      if (weight > normWeight.get()) {
         normWeight.set(weight);
       }
-
       response.add(TagResponse.builder()
           .name(name)
           .weight(weight)
           .build());
     }
     response.forEach(tagResponse -> tagResponse
-        .setWeight(tagResponse.getWeight()*(1/normWeight.get())));
+        .setWeight(tagResponse.getWeight() * (1 / normWeight.get())));
     return TagListResponse
         .builder()
         .tags(response)
