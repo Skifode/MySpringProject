@@ -3,6 +3,7 @@ package main.service;
 import com.github.cage.Cage;
 import java.util.Base64;
 import java.util.GregorianCalendar;
+import java.util.UUID;
 import main.api.response.CaptchaResponse;
 import main.model.CaptchaCode;
 import main.repository.CaptchaCodesRepository;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service @EnableScheduling
@@ -31,8 +31,7 @@ public class CaptchaService {
 
       String code = cage.getTokenGenerator().next();
       String img = Base64.getEncoder().encodeToString(cage.draw(code));
-      String secretCode = new BCryptPasswordEncoder(4)
-          .encode(img.substring(1000,1024)); //не лучшая идея?
+      String secretCode = UUID.randomUUID().toString();
 
       CaptchaCode newCode = new CaptchaCode(new GregorianCalendar().getTime(), code, secretCode);
       codesRepository.save(newCode);
@@ -44,7 +43,7 @@ public class CaptchaService {
     }
 
   @Scheduled(fixedRate = 3600000)
-  public void deleteOld() {
-    codesRepository.deleteOld();
+  public void deleteOldCaptcha() {
+    codesRepository.deleteOldCaptcha();
   }
 }
