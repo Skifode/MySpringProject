@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

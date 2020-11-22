@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import com.github.cage.Cage;
 import com.github.cage.image.EffectConfig;

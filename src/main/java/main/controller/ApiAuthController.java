@@ -1,4 +1,4 @@
-package main.controllers;
+package main.controller;
 
 import java.security.Principal;
 import main.api.request.LoginRequest;
@@ -7,8 +7,8 @@ import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
 import main.api.response.LogoutResponse;
 import main.api.response.ResultErrorsResponse;
-import main.services.CaptchaService;
-import main.services.UserService;
+import main.service.CaptchaService;
+import main.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

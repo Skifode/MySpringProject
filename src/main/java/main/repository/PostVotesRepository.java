@@ -1,4 +1,4 @@
-package main.repositories;
+package main.repository;
 
 import java.util.Optional;
 import main.model.PostVote;
@@ -11,5 +11,11 @@ public interface PostVotesRepository extends CrudRepository<PostVote, Integer> {
       , nativeQuery = true)
   Optional<PostVote> findByUserIdAndPostId(
       @Param("user_id") int userId, @Param("post_id") int postId);
+
+  @Query(value = "select count(*) from post_vote where value > 0", nativeQuery = true)
+  int getCountOfLikes();
+
+  @Query(value = "select count(*) from post_vote where value < 0", nativeQuery = true)
+  int getCountOfDislikes();
 
 }

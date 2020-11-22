@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import java.io.IOException;
 import java.util.TreeMap;
@@ -6,7 +6,7 @@ import main.api.request.ProfileSettingsRequest;
 import main.api.response.ResultErrorsResponse;
 import main.data.UploadType;
 import main.model.User;
-import main.repositories.UsersRepository;
+import main.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

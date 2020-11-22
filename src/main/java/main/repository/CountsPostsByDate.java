@@ -1,4 +1,4 @@
-package main.repositories;
+package main.repository;
 
 public interface CountsPostsByDate {
   String getDate();

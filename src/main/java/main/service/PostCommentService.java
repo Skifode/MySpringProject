@@ -1,13 +1,13 @@
-package main.services;
+package main.service;
 
 import java.util.Date;
 import java.util.TreeMap;
 import main.api.request.AddCommentRequest;
 import main.api.response.ResultErrorsResponse;
 import main.model.PostComment;
-import main.repositories.PostCommentsRepository;
-import main.repositories.PostsRepository;
-import main.repositories.UsersRepository;
+import main.repository.PostCommentsRepository;
+import main.repository.PostsRepository;
+import main.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

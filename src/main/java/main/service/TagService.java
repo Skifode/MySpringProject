@@ -1,14 +1,13 @@
-package main.services;
+package main.service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import main.api.response.TagListResponse;
 import main.api.response.TagResponse;
-import main.model.Tag;
-import main.repositories.PostsRepository;
-import main.repositories.Tag2PostRepository;
-import main.repositories.TagsRepository;
+import main.repository.PostsRepository;
+import main.repository.Tag2PostRepository;
+import main.repository.TagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,23 +31,18 @@ public class TagService {
     double countOfPosts = postsRepository.getPosts2ShowCount();
 
     AtomicReference<Double> normWeight = new AtomicReference<>((double) 0);
-    Iterable<Tag> tagsList = tagsRepository.findAllAccepted();
 
-    for (Tag tag : tagsList
-    ) {
+    tagsRepository.findAllAcceptedTags().forEach(tag -> {
       String name = tag.getName();
-      double weight = tag2PostRepository.findByTagId(tag.getId()).size() / countOfPosts;
+      int id = tag.getId();
+      double weight = tag2PostRepository.findByTagId(id).size() / countOfPosts;
 
-      if (weight > normWeight.get()) {
-        normWeight.set(weight);
-      }
+      normWeight.set(Math.max(weight, normWeight.get()));
       response.add(TagResponse.builder()
           .name(name)
-          .weight(weight)
+          .weight(weight * (1 / normWeight.get()))
           .build());
-    }
-    response.forEach(tagResponse -> tagResponse
-        .setWeight(tagResponse.getWeight() * (1 / normWeight.get())));
+    });
     return TagListResponse
         .builder()
         .tags(response)

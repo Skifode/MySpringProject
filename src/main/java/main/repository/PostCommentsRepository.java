@@ -1,4 +1,4 @@
-package main.repositories;
+package main.repository;
 
 import java.util.List;
 import main.model.PostComment;

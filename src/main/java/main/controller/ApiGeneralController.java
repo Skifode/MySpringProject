@@ -1,4 +1,4 @@
-package main.controllers;
+package main.controller;
 
 import java.security.Principal;
 import java.util.Calendar;
@@ -10,11 +10,12 @@ import main.api.response.CalendarResponse;
 import main.api.response.InitResponse;
 import main.api.response.SettingsResponse;
 import main.api.response.TagListResponse;
-import main.services.PostCommentService;
-import main.services.PostService;
-import main.services.ProfileSettingsService;
-import main.services.SettingsService;
-import main.services.TagService;
+import main.service.PostCommentService;
+import main.service.PostService;
+import main.service.ProfileSettingsService;
+import main.service.SettingsService;
+import main.service.StatisticService;
+import main.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,19 +37,22 @@ public class ApiGeneralController {
   private final PostService postService;
   private final ProfileSettingsService profileSettingsService;
   private final PostCommentService postCommentService;
+  private final StatisticService statisticService;
 
 
   @Autowired
   public ApiGeneralController(InitResponse initResponseInfo, SettingsService settings,
       TagService tagService, PostService postService,
       ProfileSettingsService profileSettingsService,
-      PostCommentService postCommentService) {
+      PostCommentService postCommentService,
+      StatisticService statisticService) {
     this.initResponseInfo = initResponseInfo;
     this.settings = settings;
     this.tagService = tagService;
     this.postService = postService;
     this.profileSettingsService = profileSettingsService;
     this.postCommentService = postCommentService;
+    this.statisticService = statisticService;
   }
 
   @GetMapping("/api/init")
@@ -108,5 +112,16 @@ public class ApiGeneralController {
       Principal principal) {
     return postService.setModerationStatus(
         request.getDecision(), request.getPostId(), principal.getName());
+  }
+
+  @GetMapping(value = "/api/statistics/all")
+  public ResponseEntity<?> getAllStatistic() {
+    return statisticService.getAllStatistic();
+  }
+
+  @PreAuthorize("hasAuthority('user:write')")
+  @GetMapping(value = "/api/statistics/my")
+  public ResponseEntity<?> getPersonalStatistic(Principal principal) {
+    return statisticService.getPersonalStatistic(principal.getName());
   }
 }

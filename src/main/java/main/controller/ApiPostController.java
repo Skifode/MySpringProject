@@ -1,12 +1,11 @@
-package main.controllers;
+package main.controller;
 
 import java.security.Principal;
 import java.util.Date;
 import main.api.request.AddPostRequest;
 import main.api.request.VoteRequest;
 import main.api.response.PostsListResponse;
-import main.api.response.SinglePostResponse;
-import main.services.PostService;
+import main.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -37,9 +36,9 @@ public class ApiPostController {
     return postService.getPosts(offset,limit,mode);
   }
 
-  @GetMapping("/api/post/{id}") public ResponseEntity<SinglePostResponse> getPostInfo(
-      @PathVariable(value = "id") int id) {
-      return new ResponseEntity<>(postService.getPostById(id), HttpStatus.OK);
+  @GetMapping("/api/post/{id}") public ResponseEntity<?> getPostInfo(
+      @PathVariable(value = "id") int id, Principal principal) {
+      return postService.getPostById(id, principal == null ? "" : principal.getName());
   }
 
   @GetMapping("/api/post/byTag")
@@ -100,6 +99,6 @@ public class ApiPostController {
   public ResponseEntity<?> putNewPost(
       @RequestBody AddPostRequest request, Principal principal,
       @PathVariable(value = "id") int id) {
-    return postService.putNewPost(request, principal.getName(), id);
+    return postService.editPost(request, principal.getName(), id);
   }
 }

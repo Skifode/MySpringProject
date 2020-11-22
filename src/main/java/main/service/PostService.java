@@ -1,10 +1,14 @@
-package main.services;
+package main.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -19,18 +23,17 @@ import main.api.response.SinglePostResponse;
 import main.data.Status;
 import main.data.UploadType;
 import main.model.Post;
-import main.model.PostComment;
 import main.model.PostVote;
 import main.model.Tag;
-import main.model.Tag2Post;
-import main.repositories.CountsPostsByDate;
-import main.repositories.PostCommentsRepository;
-import main.repositories.PostVotesRepository;
-import main.repositories.PostsRepository;
-import main.repositories.Tag2PostRepository;
-import main.repositories.TagsRepository;
-import main.repositories.UsersRepository;
-import main.repositories.YearsListForCalendar;
+import main.model.User;
+import main.repository.CountsPostsByDate;
+import main.repository.PostCommentsRepository;
+import main.repository.PostVotesRepository;
+import main.repository.PostsRepository;
+import main.repository.Tag2PostRepository;
+import main.repository.TagsRepository;
+import main.repository.UsersRepository;
+import main.repository.YearsListForCalendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -90,30 +93,60 @@ public class PostService {
         .build(), HttpStatus.OK);
   }
 
-  public SinglePostResponse getPostById(int id) { //ужс. переделаю
-    Post post = postsRepository.findById(id).orElseThrow();
-    post.incrementView();
-    postsRepository.save(post);
-    SinglePostResponse response = new SinglePostResponse(
-        new PostResponse(post), post.isActive(), post.getText());
+  public ResponseEntity<?> getPostById(int postId, String email) {
 
-    ArrayList<PostCommentsResponse> comments = new ArrayList<>();
-    List<PostComment> commentsList = commentsRepository.getByPostId(post.getId());
-    if (commentsList.size() > 0) {
-      for (PostComment com : commentsList) {
-        comments.add(new PostCommentsResponse(com));
+    boolean access = false; //права доступа на скрытый пост
+    Post post;
+
+    if (usersRepository.existsByEmail(email)) {
+      User user = usersRepository.findByEmail(email);
+      access = user.isModerator(); // модератор может смотреть любой скрытый пост
+      if (!access) {      //пользователь может смотреть только свои скрытые посты
+        access = postsRepository.countByUserIdAndPostId(user.getId(), postId) == 1;
       }
     }
 
-    List<String> tags = new ArrayList<>();
-    List<Tag2Post> tagsInt = tag2PostRepository.findByPostId(post.getId());
-    if (tagsInt.size() > 0) {
-      tagsInt.forEach(tag -> tagsRepository.findById(tag.getTagId())
-          .ifPresent(element -> tags.add(element.getName())));
+    try {
+      post = access ?
+          postsRepository.findById(postId).orElseThrow()
+          : postsRepository.findAcceptedPostById(postId).orElseThrow();
+    } catch (NoSuchElementException ex) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    response.setComments(comments);
-    response.setTags(tags);
-    return response;
+
+    post.incrementView();
+    postsRepository.save(post);
+
+    List<PostCommentsResponse> comments = commentsRepository
+        .getByPostId(post.getId())
+        .stream()
+        .map(PostCommentsResponse::new)
+        .collect(Collectors
+            .toList());
+
+    List<String> tags = tagsRepository.findTagNamesByPostId(post.getId());
+
+    Map<String, Object> user = new HashMap<>();
+    user.put("id", post.getUser().getId());
+    user.put("name", post.getUser().getName());
+
+    return new ResponseEntity<>(SinglePostResponse.builder()
+        .active(post.isActive())
+        .text(post.getText())
+        .comments(comments)
+        .dislikeCount(post.getDislikeCount())
+        .likeCount(post.getLikesCount())
+        .id(post.getId())
+        .tags(tags)
+        .timestamp(LocalDate
+            .parse(post.getTime().toString())
+            .atStartOfDay()
+            .atZone(ZoneId.of("UTC"))
+            .toEpochSecond())
+        .title(post.getTitle())
+        .user(user)
+        .viewCount(post.getViewCount())
+        .build(), HttpStatus.OK);
   }
 
   public PostsListResponse getPostsByTag(int offset, int limit, String tag) {
@@ -183,8 +216,22 @@ public class PostService {
   }
 
   public ResponseEntity<?> addNewPost(AddPostRequest request, String email) {
+
+    TreeMap<String, String> errors = postIsCorrect(request);
+    Post post = new Post();
+
+    if (errors.isEmpty()) {
+      return postAddResponse(post, request, email);
+    }
+    return new ResponseEntity<>(ResultErrorsResponse
+        .builder()
+        .result(false)
+        .errors(errors)
+        .build(), HttpStatus.BAD_REQUEST);
+  }
+
+  private TreeMap<String, String> postIsCorrect(AddPostRequest request) {
     TreeMap<String, String> errors = new TreeMap<>();
-    int userId = usersRepository.findByEmail(email).getId();
     String text = request.getText();
     String title = request.getTitle();
 
@@ -194,33 +241,7 @@ public class PostService {
     if (request.getText() == null || text.length() < 50) {
       errors.put("text", "Текст публикации слишком короткий");
     }
-    if (errors.isEmpty()) {
-      Post post = new Post();
-      Date now = new Date();
-      Date date = request.getTimestamp().before(now) ? now : request.getTimestamp();
-
-      for (String tagName : request.getTags()) {
-        Tag tag = tagsRepository.findByName(tagName);
-        post.addTag(Objects.requireNonNullElseGet(tag, () -> new Tag(tagName)));
-      }
-
-      post.setActive(request.isActive());
-      post.setText(text);
-      post.setTitle(title);
-      post.setTime(date);
-      post.setUserId(userId);
-      postsRepository.save(post);
-
-      return new ResponseEntity<>(ResultErrorsResponse
-          .builder()
-          .result(true)
-          .build(), HttpStatus.OK);
-    }
-    return new ResponseEntity<>(ResultErrorsResponse
-        .builder()
-        .result(false)
-        .errors(errors)
-        .build(), HttpStatus.BAD_REQUEST);
+    return errors;
   }
 
   public ResponseEntity<?> uploadImage2Post(MultipartFile file) {
@@ -340,8 +361,49 @@ public class PostService {
         .build(), HttpStatus.OK);
   }
 
-  public ResponseEntity<?> putNewPost(AddPostRequest request, String name, int id) {
-// спаааааааааааать
-    return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+  public ResponseEntity<?> editPost(AddPostRequest request, String email, int id) {
+
+    TreeMap<String, String> errors = postIsCorrect(request);
+
+    if (errors.isEmpty()) {
+      Post post;
+      try {
+        post = postsRepository.findById(id).orElseThrow();
+        if (!usersRepository.findByEmail(email).isModerator()) {
+          post.setModerationStatus(Status.NEW);
+        }
+      } catch (NoSuchElementException ex) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+      return postAddResponse(post, request, email);
+    }
+    return new ResponseEntity<>(ResultErrorsResponse
+        .builder()
+        .result(false)
+        .errors(errors)
+        .build(), HttpStatus.BAD_REQUEST);
+  }
+
+  private ResponseEntity<?> postAddResponse(Post post, AddPostRequest request, String email) {
+    int userId = usersRepository.findByEmail(email).getId();
+    Date now = new Date();
+    Date date = request.getTimestamp().before(now) ? now : request.getTimestamp();
+
+    for (String tagName : request.getTags()) {
+      Tag tag = tagsRepository.findByName(tagName);
+      post.addTag(Objects.requireNonNullElseGet(tag, () -> new Tag(tagName)));
+    }
+
+    post.setActive(request.isActive());
+    post.setText(request.getText());
+    post.setTitle(request.getTitle());
+    post.setTime(date);
+    post.setUserId(userId);
+    postsRepository.save(post);
+
+    return new ResponseEntity<>(ResultErrorsResponse
+        .builder()
+        .result(true)
+        .build(), HttpStatus.OK);
   }
 }

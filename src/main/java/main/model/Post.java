@@ -47,7 +47,6 @@ public class Post {
   private int userId; //автор поста
 
   @Column(nullable = false, columnDefinition = "DATETIME")
-  //@Setter(AccessLevel.NONE)
   @Temporal(TemporalType.DATE)
   private Date time; //дата и время публикации поста
 

@@ -1,7 +1,8 @@
-package main.repositories;
+package main.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import main.model.Post;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -10,8 +11,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface PostsRepository extends CrudRepository<Post, Integer> {
 
+  @Query(value = "SELECT count(*) FROM post where id = :id and user_id = :user_id"
+      , nativeQuery = true)
+  int countByUserIdAndPostId(@Param("user_id") int userId, @Param("id") int id);
+
   @Query(value = "SELECT * FROM post where is_active = 1 "
-      + "and moderation_status  = 'ACCEPTED' and date(time) = :date order by -time", nativeQuery = true)
+      + "and moderation_status  = 'ACCEPTED' and date(time) = :date "
+      + "order by time desc, view_count desc"
+      , nativeQuery = true)
   List<Post> findByDate(Pageable page, @Param(value = "date") Date date);
 
   @Query(value = "SELECT * FROM post where is_active = 1 "
@@ -24,14 +31,14 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
 
   @Query(value =
       "SELECT * FROM post where is_active = 1 "
-          + "and moderation_status  = 'ACCEPTED' order by -(select count(*) from post_comment\n"
-          + "where post.id = post_comment.post_id)", nativeQuery = true)
+          + "and moderation_status  = 'ACCEPTED' order by (select count(*) from post_comment\n"
+          + "where post.id = post_comment.post_id) desc, view_count desc", nativeQuery = true)
   List<Post> findByPopular(Pageable page);
 
   @Query(value =
       "SELECT * FROM post where is_active = 1 "
           + "and moderation_status  = 'ACCEPTED' order by (select sum(value = 1) from post_vote\n"
-          + "where post.id = post_vote.post_id) desc", nativeQuery = true)
+          + "where post.id = post_vote.post_id) desc, view_count desc", nativeQuery = true)
   List<Post> findByBest(Pageable page);
 
   @Query(value = "SELECT * FROM post where is_active = 1 "
@@ -40,7 +47,9 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
       + "order by time desc", nativeQuery = true)
   List<Post> findByTag(Pageable page, @Param(value = "tagId") int tagId);
 
-  @Query(value = "SELECT year(time) as years2calendar FROM post group by year(time) order by -year(time)"
+  @Query(value = "SELECT year(time) as years2calendar FROM post "
+      + "group by years2calendar"
+      + " order by -years2calendar"
       , nativeQuery = true)
   List<YearsListForCalendar> getYears();
 
@@ -155,4 +164,39 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
           + "and moderation_status = 'ACCEPTED'"
           + " and user_id = :user_id", nativeQuery = true)
   int getMyAcceptedPostsCount(@Param(value = "user_id") int userId);
+
+  @Query(value = "select * from post where id = :post_id and moderation_status = 'ACCEPTED'"
+      , nativeQuery = true)
+  Optional<Post> findAcceptedPostById(@Param(value = "post_id") int postId);
+
+  @Query(value = "SELECT"
+      + " count(*) as postsCount,"
+      + " (select count(value) from post_vote"
+      + " right join post p on post_vote.post_id = p.id"
+      + " where value > 0 and p.is_active = 1"
+      + " and p.moderation_status = 'ACCEPTED') as likesCount, "
+      + " (select count(value) from post_vote"
+      + " right join post p on post_vote.post_id = p.id"
+      + " where value < 0 and p.is_active = 1"
+      + " and p.moderation_status = 'ACCEPTED') as dislikesCount,"
+      + " sum(view_count) as viewsCount,"
+      + " min(post.time) as firstPublication"
+      + " FROM post where is_active = 1 and moderation_status = 'ACCEPTED'", nativeQuery = true)
+  Statistic getBlogStatistic();
+
+  @Query(value = "SELECT"
+      + " count(*) as postsCount,"
+      + " (select count(value) from post_vote"
+      + " right join post p on post_vote.post_id = p.id"
+      + " where value > 0 and p.is_active = 1 and p.user_id = :user_id"
+      + " and p.moderation_status = 'ACCEPTED') as likesCount, "
+      + " (select count(value) from post_vote"
+      + " right join post p on post_vote.post_id = p.id"
+      + " where value < 0 and p.is_active = 1 and p.user_id = :user_id"
+      + " and p.moderation_status = 'ACCEPTED') as dislikesCount,"
+      + " sum(view_count) as viewsCount,"
+      + " min(post.time) as firstPublication"
+      + " FROM post where is_active = 1 and moderation_status = 'ACCEPTED'"
+      + " and user_id = :user_id", nativeQuery = true)
+  Statistic getPersonalBlogStatistic(@Param("user_id") int userId);
 }

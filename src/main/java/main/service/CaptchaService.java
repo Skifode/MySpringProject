@@ -1,11 +1,11 @@
-package main.services;
+package main.service;
 
 import com.github.cage.Cage;
 import java.util.Base64;
 import java.util.GregorianCalendar;
 import main.api.response.CaptchaResponse;
 import main.model.CaptchaCode;
-import main.repositories.CaptchaCodesRepository;
+import main.repository.CaptchaCodesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;

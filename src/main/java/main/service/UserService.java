@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import java.util.TreeMap;
 import main.api.request.LoginRequest;
@@ -7,9 +7,9 @@ import main.api.response.LoginResponse;
 import main.api.response.ResultErrorsResponse;
 import main.api.response.UserLoginResponse;
 import main.model.User;
-import main.repositories.CaptchaCodesRepository;
-import main.repositories.PostsRepository;
-import main.repositories.UsersRepository;
+import main.repository.CaptchaCodesRepository;
+import main.repository.PostsRepository;
+import main.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
