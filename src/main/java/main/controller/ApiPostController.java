@@ -48,6 +48,7 @@ public class ApiPostController {
       @RequestParam(defaultValue = "Java") String tag) {
     return new ResponseEntity<>(postService.getPostsByTag(offset, limit, tag), HttpStatus.OK);
   }
+
   @GetMapping("/api/post/byDate")
   public ResponseEntity<PostsListResponse> getPostByDate(
       @RequestParam(defaultValue = "0") int offset,
@@ -55,6 +56,7 @@ public class ApiPostController {
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
     return new ResponseEntity<>(postService.getPostsByDate(offset, limit, date), HttpStatus.OK);
   }
+
   @GetMapping("/api/post/search")
   public ResponseEntity<PostsListResponse> getPostByQuery(
       @RequestParam(defaultValue = "0") int offset,
@@ -62,12 +64,14 @@ public class ApiPostController {
       @RequestParam(defaultValue = "") String query) {
     return new ResponseEntity<>(postService.getPostsByQuery(offset, limit, query), HttpStatus.OK);
   }
+
   @PostMapping("/api/post")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<?> addNewPost(
       @RequestBody AddPostRequest request, Principal principal) {
     return postService.addNewPost(request, principal.getName());
   }
+
   @GetMapping("/api/post/moderation")
   @PreAuthorize("hasAuthority('user:moderate')")
   public ResponseEntity<?> getPosts2Moderate(
@@ -76,16 +80,19 @@ public class ApiPostController {
       @RequestParam(defaultValue = "") String status, Principal principal) {
     return postService.posts2moderate(offset, limit, status, principal.getName());
   }
+
   @PostMapping("/api/post/like")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<?> setLike(@RequestBody VoteRequest request, Principal principal) {
     return postService.setLike(request.getPostId(), principal.getName(), (byte) 1);
   }
+
   @PostMapping("/api/post/dislike")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<?> setDislike(@RequestBody VoteRequest request, Principal principal) {
     return postService.setLike(request.getPostId(), principal.getName(), (byte) -1);
   }
+
   @GetMapping("/api/post/my")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<?> getMyPosts(
@@ -94,6 +101,7 @@ public class ApiPostController {
       @RequestParam(defaultValue = "") String status, Principal principal) {
     return postService.getMyPosts(offset, limit, status, principal.getName());
   }
+
   @PutMapping("/api/post/{id}")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<?> putNewPost(
