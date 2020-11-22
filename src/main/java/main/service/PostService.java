@@ -294,20 +294,24 @@ public class PostService {
 
   public ResponseEntity<?> setModerationStatus(String decision, int postId, String email) {
     int moderId = usersRepository.findByEmail(email).getId();
-    switch (decision) {
-      case "accept" -> postsRepository.findById(postId)
-          .ifPresent(p -> {
-            p.setModerationStatus(Status.ACCEPTED);
-            p.setModeratorId(moderId);
-            postsRepository.save(p);
-          });
-      case "decline" -> postsRepository.findById(postId)
-          .ifPresent(p -> {
-            p.setModerationStatus(Status.DECLINED);
-            p.setModeratorId(moderId);
-            postsRepository.save(p);
-          });
+    Status status;
+
+    try {
+      status = switch (decision) {
+        case "accept" -> Status.ACCEPTED;
+        case "decline" -> Status.DECLINED;
+        default -> throw new IllegalArgumentException();
+      };
+    } catch (IllegalArgumentException ia) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
+    postsRepository.findById(postId)
+        .ifPresent(p -> {
+          p.setModerationStatus(status);
+          p.setModeratorId(moderId);
+          postsRepository.save(p);
+        });
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

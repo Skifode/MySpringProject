@@ -30,7 +30,7 @@ public class ApiPostController {
   }
 
   @GetMapping("/api/post") public ResponseEntity<?> getPosts(
-      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(required = false, defaultValue = "0") int offset,
       @RequestParam(defaultValue = "10") int limit,
       @RequestParam(defaultValue = "recent") String mode) {
     return postService.getPosts(offset,limit,mode);
@@ -43,7 +43,7 @@ public class ApiPostController {
 
   @GetMapping("/api/post/byTag")
   public ResponseEntity<PostsListResponse> getPostByTag(
-      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(required = false, defaultValue = "0") int offset,
       @RequestParam(defaultValue = "10") int limit,
       @RequestParam(defaultValue = "Java") String tag) {
     return new ResponseEntity<>(postService.getPostsByTag(offset, limit, tag), HttpStatus.OK);
@@ -51,7 +51,7 @@ public class ApiPostController {
 
   @GetMapping("/api/post/byDate")
   public ResponseEntity<PostsListResponse> getPostByDate(
-      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(required = false, defaultValue = "0") int offset,
       @RequestParam(defaultValue = "10") int limit,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
     return new ResponseEntity<>(postService.getPostsByDate(offset, limit, date), HttpStatus.OK);
@@ -59,7 +59,7 @@ public class ApiPostController {
 
   @GetMapping("/api/post/search")
   public ResponseEntity<PostsListResponse> getPostByQuery(
-      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(required = false, defaultValue = "0") int offset,
       @RequestParam(defaultValue = "10") int limit,
       @RequestParam(defaultValue = "") String query) {
     return new ResponseEntity<>(postService.getPostsByQuery(offset, limit, query), HttpStatus.OK);
@@ -75,9 +75,10 @@ public class ApiPostController {
   @GetMapping("/api/post/moderation")
   @PreAuthorize("hasAuthority('user:moderate')")
   public ResponseEntity<?> getPosts2Moderate(
-      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(required = false, defaultValue = "0") int offset,
       @RequestParam(defaultValue = "10") int limit,
-      @RequestParam(defaultValue = "") String status, Principal principal) {
+      @RequestParam(defaultValue = "new") String status,
+      Principal principal) {
     return postService.posts2moderate(offset, limit, status, principal.getName());
   }
 
@@ -96,9 +97,10 @@ public class ApiPostController {
   @GetMapping("/api/post/my")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<?> getMyPosts(
-      @RequestParam(defaultValue = "0") int offset,
+      @RequestParam(required = false, defaultValue = "0") int offset,
       @RequestParam(defaultValue = "10") int limit,
-      @RequestParam(defaultValue = "") String status, Principal principal) {
+      @RequestParam(defaultValue = "") String status,
+      Principal principal) {
     return postService.getMyPosts(offset, limit, status, principal.getName());
   }
 
