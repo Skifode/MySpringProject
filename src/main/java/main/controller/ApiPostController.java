@@ -5,6 +5,7 @@ import java.util.Date;
 import main.api.request.AddPostRequest;
 import main.api.request.VoteRequest;
 import main.api.response.PostsListResponse;
+import main.data.Vote;
 import main.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -85,13 +86,13 @@ public class ApiPostController {
   @PostMapping("/api/post/like")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<?> setLike(@RequestBody VoteRequest request, Principal principal) {
-    return postService.setLike(request.getPostId(), principal.getName(), (byte) 1);
+    return postService.setVote(request.getPostId(), principal.getName(), Vote.LIKE);
   }
 
   @PostMapping("/api/post/dislike")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<?> setDislike(@RequestBody VoteRequest request, Principal principal) {
-    return postService.setLike(request.getPostId(), principal.getName(), (byte) -1);
+    return postService.setVote(request.getPostId(), principal.getName(), Vote.DISLIKE);
   }
 
   @GetMapping("/api/post/my")

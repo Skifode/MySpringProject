@@ -22,6 +22,7 @@ import main.api.response.ResultErrorsResponse;
 import main.api.response.SinglePostResponse;
 import main.data.Status;
 import main.data.UploadType;
+import main.data.Vote;
 import main.model.Post;
 import main.model.PostVote;
 import main.model.Tag;
@@ -315,7 +316,13 @@ public class PostService {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  public ResponseEntity<?> setLike(int postId, String email, byte value) {
+  public ResponseEntity<?> setVote(int postId, String email, Vote vote) {
+
+    byte value = switch (vote) {
+      case LIKE -> (byte) 1;
+      case DISLIKE -> (byte) -1;
+    };
+
     int userId = usersRepository.findByEmail(email).getId();
     PostVote postVote = postVotesRepository
         .findByUserIdAndPostId(userId, postId)
