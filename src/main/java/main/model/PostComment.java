@@ -39,7 +39,7 @@ public class PostComment {
   private int userId; //автор комментария
 
   @Column(nullable = false, columnDefinition = "DATETIME")
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date time; //дата и время комментария
 
   @Column(columnDefinition = "TEXT", nullable = false)

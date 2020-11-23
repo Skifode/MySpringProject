@@ -30,7 +30,7 @@ public class PostVote {
   private int postId; //пост, которому поставлен лайк / дизлайк
 
   @Column(nullable = false, columnDefinition = "DATETIME")
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date time; //дата и время лайка / дизлайка
 
   @Column(columnDefinition = "TINYINT", nullable = false)

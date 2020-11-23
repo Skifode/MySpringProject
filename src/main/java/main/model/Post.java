@@ -47,7 +47,7 @@ public class Post {
   private int userId; //автор поста
 
   @Column(nullable = false, columnDefinition = "DATETIME")
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date time; //дата и время публикации поста
 
   @Column(nullable = false)

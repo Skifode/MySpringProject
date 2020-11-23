@@ -26,7 +26,7 @@ public class CaptchaCode {
   private int id; //id каптча
 
   @Column(nullable = false, columnDefinition = "DATETIME")
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date time; //дата и время генерации кода капчи
 
   @Column(columnDefinition = "TINYTEXT", nullable = false)

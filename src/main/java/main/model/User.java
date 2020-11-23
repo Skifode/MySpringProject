@@ -19,10 +19,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import main.data.Role;
 
-@Data @Entity @ToString(exclude = {"posts", "comments", "votes"})
+@Data @Entity
 @AllArgsConstructor @NoArgsConstructor
 public class User { //У тестовых пользователей пароль "password" !!!
   public User(String email, String password, String name) {
@@ -45,7 +44,7 @@ public class User { //У тестовых пользователей парол�
 
   @Column(nullable = false, columnDefinition = "DATETIME")
   @Setter(AccessLevel.NONE)
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date regTime; //дата и время регистрации пользователя
 
   @Column(nullable = false)

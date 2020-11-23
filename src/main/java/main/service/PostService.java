@@ -1,8 +1,6 @@
 package main.service;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -139,11 +137,9 @@ public class PostService {
         .likeCount(post.getLikesCount())
         .id(post.getId())
         .tags(tags)
-        .timestamp(LocalDate
-            .parse(post.getTime().toString())
-            .atStartOfDay()
-            .atZone(ZoneId.of("UTC"))
-            .toEpochSecond())
+        .timestamp(post.getTime()
+            .toInstant()
+            .getEpochSecond())
         .title(post.getTitle())
         .user(user)
         .viewCount(post.getViewCount())
