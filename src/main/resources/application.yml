@@ -9,6 +9,7 @@ spring.servlet.multipart.enabled: true
 spring.servlet.multipart.max-file-size: 25MB
 spring.servlet.multipart.max-request-size: 25MB
 
+blog.path: http://localhost:8080/
 
 upload.file.path: /C:/Users/pow35/Documents/myhw/skillbox/diplom/images
 upload.avatars: images/avatars
@@ -26,3 +27,11 @@ blog.phone: +7 903 666-44-55
 blog.email: mail@mail.ru
 blog.copyright: Александр Дмитриев
 blog.copyrightFrom: все права не защитить. 2005
+
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation: true
+
+spring.mail.host: smtp.yandex.ru
+spring.mail.username: pass-res-srv@yandex.ru
+spring.mail.password: BeanPostProcessor
+spring.mail.port: 465
+spring.mail.protocol: smtps

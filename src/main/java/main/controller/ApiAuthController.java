@@ -1,8 +1,10 @@
 package main.controller;
 
 import java.security.Principal;
+import main.api.request.ChangePasswordRequest;
 import main.api.request.LoginRequest;
 import main.api.request.RegisterRequest;
+import main.api.request.RestorePasswordRequest;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
 import main.api.response.LogoutResponse;
@@ -64,5 +66,15 @@ public class ApiAuthController {
   @GetMapping("/captcha")
   public ResponseEntity<CaptchaResponse> captcha() {
     return new ResponseEntity<>(captchaService.getResponse(), HttpStatus.OK);
+  }
+
+  @PostMapping(value = "/restore", consumes = "application/json")
+  public ResponseEntity<?> restorePassword(@RequestBody RestorePasswordRequest request) {
+    return userService.restorePassword(request.getEmail().trim());
+  }
+
+  @PostMapping("/password")
+  public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    return userService.changePassword(request);
   }
 }
