@@ -9,10 +9,10 @@ spring.servlet.multipart.enabled: true
 spring.servlet.multipart.max-file-size: 25MB
 spring.servlet.multipart.max-request-size: 25MB
 
-spring.resources.static-locations: classpath:/static, classpath:/images
 
-upload.avatars: src/main/resources/images/avatars
-upload.image: src/main/resources/images/posts
+upload.file.path: /C:/Users/pow35/Documents/myhw/skillbox/diplom/images
+upload.avatars: images/avatars
+upload.image: images/posts
 
 avatar.height: 36
 avatar.width: 36

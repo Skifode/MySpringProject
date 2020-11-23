@@ -1,7 +1,5 @@
 package main.api.response;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
@@ -19,11 +17,10 @@ public class PostCommentsResponse {
 
   public PostCommentsResponse(PostComment comment) {
     this.id = comment.getId();
-    this.timestamp = LocalDate.parse(comment.getTime()
-        .toString())
-        .atStartOfDay()
-        .atZone(ZoneId.of("UTC"))
-        .toEpochSecond();
+    this.timestamp = comment
+        .getTime()
+        .toInstant()
+        .getEpochSecond();
     this.text = comment.getText();
     user.put("id", comment.getUser().getId());
     user.put("name", comment.getUser().getName());

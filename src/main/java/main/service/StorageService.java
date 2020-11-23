@@ -61,7 +61,7 @@ public class StorageService {
     } else {
       return saveImage(image, type);
     }
-    return filePath.split("/images")[1];
+    return filePath.split("images")[1];
   }
 
   private String getRandomPath() {
