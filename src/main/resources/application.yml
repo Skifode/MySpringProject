@@ -19,6 +19,8 @@ avatar.height: 36
 avatar.width: 36
 
 settings.positive: 'YES'
+settings.negative: 'NO'
+
 captcha.response.attribute: data:image/png;base64,
 
 blog.title: DevPub
