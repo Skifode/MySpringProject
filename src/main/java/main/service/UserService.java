@@ -50,17 +50,25 @@ public class UserService {
   }
 
   public LoginResponse getAuth(LoginRequest request) {
-    User currentUser = usersRepository.findByEmail(request.getEmail());
+    String email = request.getEmail();
+    String requestPassword = request.getPassword();
+    User currentUser = usersRepository.findByEmail(email);
+    String passFromBase = currentUser == null ? "" : currentUser.getPassword();
 
-    if (currentUser != null && new BCryptPasswordEncoder(12)
-        .matches(request.getPassword(), currentUser.getPassword())) {
+    boolean isCorrectPassword =
+        new BCryptPasswordEncoder(12)
+            .matches(requestPassword, passFromBase);
 
+    if (isCorrectPassword) {
       Authentication authentication = authenticationManager
-          .authenticate(
-              new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+          .authenticate(new UsernamePasswordAuthenticationToken(email, requestPassword));
 
-      return getLoginResponse(request.getEmail());
+      SecurityContextHolder
+          .getContext()
+          .setAuthentication(authentication);
+
+      return getLoginResponse(email);
+
     } else {
       return LoginResponse.builder()
           .result(false)
@@ -70,13 +78,13 @@ public class UserService {
 
   public LoginResponse getLoginResponse(String email) {
     User currentUser = usersRepository.findByEmail(email);
-    int count = currentUser.isModerator() ? postsRepository.getNewPostsCount() : 0;
+    int posts2ModerateCount = currentUser.isModerator() ? postsRepository.getNewPostsCount() : 0;
 
     UserLoginResponse userLoginResponse = UserLoginResponse.builder()
         .email(currentUser.getEmail())
         .id(currentUser.getId())
         .moderation(currentUser.isModerator())
-        .moderationCount(count)
+        .moderationCount(posts2ModerateCount)
         .photo(currentUser.getPhoto())
         .name(currentUser.getName()).build();
     return LoginResponse.builder()
@@ -146,13 +154,16 @@ public class UserService {
       errorsMap.put("code",
           "Ссылка для восстановления пароля устарела или не существует." +
               "<a href=\"/login/restore-password\">Запросить ссылку снова</a>");
+
     } else if (errorsMap.isEmpty()) {
+
       user.setPassword(new BCryptPasswordEncoder(12).encode(pass));
       user.setCode(null);
       usersRepository.save(user);
       return new ResponseEntity<>(ResultErrorsResponse.builder()
           .result(true)
           .build(), HttpStatus.OK);
+
     }
     return new ResponseEntity<>(ResultErrorsResponse
         .builder()

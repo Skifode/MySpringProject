@@ -27,7 +27,7 @@ public class TagService {
   }
 
   public TagListResponse getTagList() {
-    List<TagResponse> response = new ArrayList<>();
+    List<TagResponse> tagResponseList = new ArrayList<>();
     double countOfPosts = postsRepository.getPosts2ShowCount();
 
     AtomicReference<Double> normWeight = new AtomicReference<>((double) 0);
@@ -36,16 +36,17 @@ public class TagService {
       String name = tag.getName();
       int id = tag.getId();
       double weight = tag2PostRepository.findByTagId(id).size() / countOfPosts;
+      double value = Math.max(weight, normWeight.get());
+      normWeight.set(value);
 
-      normWeight.set(Math.max(weight, normWeight.get()));
-      response.add(TagResponse.builder()
+      tagResponseList.add(TagResponse.builder()
           .name(name)
           .weight(weight * (1 / normWeight.get()))
           .build());
     });
     return TagListResponse
         .builder()
-        .tags(response)
+        .tags(tagResponseList)
         .build();
   }
 }

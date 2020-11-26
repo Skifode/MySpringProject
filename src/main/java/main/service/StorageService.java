@@ -37,8 +37,7 @@ public class StorageService {
         .requireNonNull(image.getContentType())
         .toLowerCase()
         .split("/")[1]; // ex: image/jpg
-
-    System.out.println(contentType);
+    String path = getRandomPath() + image.getOriginalFilename();
 
     if (!contentType.contains("jpg") &&
         !contentType.contains("jpeg") ||
@@ -48,8 +47,8 @@ public class StorageService {
     }
 
     String filePath = switch (type) {
-      case IMAGE -> imageUploadDirectory + getRandomPath() + image.getOriginalFilename();
-      case AVATAR -> avatarsUploadDirectory + getRandomPath() + image.getOriginalFilename();
+      case IMAGE -> imageUploadDirectory + path;
+      case AVATAR -> avatarsUploadDirectory + path;
     };
     BufferedImage bufferedImage = switch (type) {
       case AVATAR -> resizeImage(ImageIO.read(image.getInputStream()));

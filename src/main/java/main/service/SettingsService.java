@@ -2,6 +2,7 @@ package main.service;
 
 import java.util.NoSuchElementException;
 import main.api.response.SettingsResponse;
+import main.model.GlobalSettings;
 import main.repository.GlobalSettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,16 +33,14 @@ public class SettingsService {
 
     settingsRepository.findAll().forEach(sett -> {
       String code = sett.getCode();
+      boolean value = sett.getValue().equals(positive);
 
       switch (code) {
-        case "MULTIUSER_MODE" -> response
-            .setMultiuserMode(sett.getValue().equals(positive));
+        case "MULTIUSER_MODE" -> response.setMultiuserMode(value);
 
-        case "POST_PREMODERATION" -> response
-            .setPostModeration(sett.getValue().equals(positive));
+        case "POST_PREMODERATION" -> response.setPostModeration(value);
 
-        case "STATISTICS_IS_PUBLIC" -> response
-            .setStatisticsIsPublic(sett.getValue().equals(positive));
+        case "STATISTICS_IS_PUBLIC" -> response.setStatisticsIsPublic(value);
       }
     });
     return response;
@@ -51,17 +50,18 @@ public class SettingsService {
     try {
       settingsRepository.findAll().forEach(sett -> {
         String code = sett.getCode();
+        GlobalSettings settings = settingsRepository
+            .findById(sett.getId())
+            .orElseThrow();
+
         switch (code) {
-          case "MULTIUSER_MODE" -> settingsRepository
-              .findById(sett.getId()).orElseThrow()
+          case "MULTIUSER_MODE" -> settings
               .setValue(request.isMultiuserMode() ? positive : negative);
 
-          case "POST_PREMODERATION" -> settingsRepository
-              .findById(sett.getId()).orElseThrow()
+          case "POST_PREMODERATION" -> settings
               .setValue(request.isPostModeration() ? positive : negative);
 
-          case "STATISTICS_IS_PUBLIC" -> settingsRepository
-              .findById(sett.getId()).orElseThrow()
+          case "STATISTICS_IS_PUBLIC" -> settings
               .setValue(request.isStatisticsIsPublic() ? positive : negative);
         }
         settingsRepository.save(sett);

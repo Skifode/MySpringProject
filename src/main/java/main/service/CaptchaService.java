@@ -30,14 +30,16 @@ public class CaptchaService {
       Cage cage = new CyrillicCage();
 
       String code = cage.getTokenGenerator().next();
-      String img = Base64.getEncoder().encodeToString(cage.draw(code));
+      String img = ATTRIBUTE + Base64.getEncoder().encodeToString(cage.draw(code));
       String secretCode = UUID.randomUUID().toString();
 
-      CaptchaCode newCode = new CaptchaCode(new GregorianCalendar().getTime(), code, secretCode);
+      CaptchaCode newCode = new CaptchaCode(
+          new GregorianCalendar().getTime(), code, secretCode);
+
       codesRepository.save(newCode);
 
       return CaptchaResponse.builder()
-          .image(ATTRIBUTE + img)
+          .image(img)
           .secret(secretCode)
           .build();
     }

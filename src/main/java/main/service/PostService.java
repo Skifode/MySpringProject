@@ -215,10 +215,9 @@ public class PostService {
   public ResponseEntity<?> addNewPost(AddPostRequest request, String email) {
 
     TreeMap<String, String> errors = postIsCorrect(request);
-    Post post = new Post();
 
     if (errors.isEmpty()) {
-      return postAddResponse(post, request, email);
+      return postAddResponse(new Post(), request, email);
     }
     return new ResponseEntity<>(ResultErrorsResponse
         .builder()
