@@ -33,7 +33,7 @@ blog.copyrightFrom: все права не защитить. 2005
 spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation: true
 
 spring.mail.host: smtp.yandex.ru
-spring.mail.username: pass-res-srv@yandex.ru
-spring.mail.password: BeanPostProcessor
+spring.mail.username: email
+spring.mail.password: pass
 spring.mail.port: 465
 spring.mail.protocol: smtps
