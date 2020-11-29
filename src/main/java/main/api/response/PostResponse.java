@@ -18,12 +18,15 @@ public class PostResponse {
   private long viewCount;
 
   public PostResponse(Post post) {
+    String announce = post.getText()
+        .replaceAll("<.*?>",""); //removing html
+
     this.setId(post.getId());
     this.setTimestamp(post.getTime()
         .toInstant()
         .getEpochSecond());
     this.setTitle(post.getTitle());
-    this.setAnnounce(post.getText().substring(0, 50) + "...");
+    this.setAnnounce(announce.substring(0, Math.min(announce.length(), 50)) + "...");
     this.getUser().put("id", post.getUser().getId());
     this.getUser().put("name", post.getUser().getName());
     this.setLikeCount(post.getLikesCount());

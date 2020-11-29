@@ -148,15 +148,25 @@ public class PostService {
 
   public PostsListResponse getPostsByTag(int offset, int limit, String tag) {
 
-    Pageable pageable = PageRequest.of(offset / limit, limit);
+    List<PostResponse> postResponses = new ArrayList<>();
+    int count = 0;
 
-    int tagId = tagsRepository.findByName(tag).getId();
-    int count = tag2PostRepository.findByTagId(tagId).size();
-    List<Post> posts = new ArrayList<>(postsRepository.findByTag(pageable, tagId));
+    List<Post> posts;
+    Pageable pageable;
+    int tagId;
 
-    List<PostResponse> postResponses = posts.stream()
-        .map(PostResponse::new)
-        .collect(Collectors.toList());
+    if (tagsRepository.existsByName(tag)) {
+
+      pageable = PageRequest.of(offset / limit, limit);
+
+      tagId = tagsRepository.findByName(tag).getId();
+      count = tag2PostRepository.findByTagId(tagId).size();
+      posts = new ArrayList<>(postsRepository.findByTag(pageable, tagId));
+
+      postResponses = posts.stream()
+          .map(PostResponse::new)
+          .collect(Collectors.toList());
+    }
 
     return PostsListResponse.builder()
         .posts(postResponses)

@@ -66,7 +66,7 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
 
   @Query(value = "select * from post p where is_active = 1"
       + " and moderation_status = 'ACCEPTED' "
-      + "and p.title like %:query% or p.text like %:query% order by -time", nativeQuery = true)
+      + "and (p.title like %:query% or p.text like %:query%) order by -time", nativeQuery = true)
   List<Post> findPostsByQuery(Pageable pageable, @Param(value = "query") String query);
 
   @Query(value = "select count(*) from post p where is_active = 1"

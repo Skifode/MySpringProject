@@ -11,7 +11,7 @@ spring.servlet.multipart.max-request-size: 25MB
 
 blog.path: http://localhost:8080/
 
-upload.file.path: /C:/Users/pow35/Documents/myhw/skillbox/diplom/images
+upload.file.path: images
 upload.avatars: images/avatars
 upload.image: images/posts
 
