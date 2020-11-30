@@ -10,7 +10,7 @@ spring.servlet.multipart.enabled: true
 spring.servlet.multipart.max-file-size: 25MB
 spring.servlet.multipart.max-request-size: 25MB
 
-blog.path: http://localhost:8080/
+blog.path: ${BLOG_PATH:http://localhost:8080/}
 
 upload.file.path: images
 upload.avatars: images/avatars
