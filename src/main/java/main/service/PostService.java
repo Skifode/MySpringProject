@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.Data;
 import main.api.request.AddPostRequest;
@@ -403,7 +404,8 @@ public class PostService {
   private ResponseEntity<?> postAddResponse(Post post, AddPostRequest request, String email) {
     int userId = usersRepository.findByEmail(email).getId();
     Date now = new Date();
-    Date date = request.getTimestamp().before(now) ? now : request.getTimestamp();
+    Date date = new Date(TimeUnit.SECONDS.toMillis(request.getTimestamp()));
+    date = date.before(now) ? now : date;
 
     for (String tagName : request.getTags()) {
       Tag tag = tagsRepository.findByName(tagName);
