@@ -21,27 +21,27 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
       , nativeQuery = true)
   List<Post> findByDate(Pageable page, @Param(value = "date") Date date);
 
-  @Query(value = "SELECT * FROM post where is_active = 1 "
+  @Query(value = "SELECT * FROM post where is_active = 1 and date(time) < now() "
       + "and moderation_status  = 'ACCEPTED' order by -time", nativeQuery = true)
   List<Post> findByRecent(Pageable page);
 
-  @Query(value = "SELECT * FROM post where is_active = 1 "
+  @Query(value = "SELECT * FROM post where is_active = 1  and date(time) < now() "
       + "and moderation_status  = 'ACCEPTED' order by time", nativeQuery = true)
   List<Post> findByEarly(Pageable page);
 
   @Query(value =
-      "SELECT * FROM post where is_active = 1 "
+      "SELECT * FROM post where is_active = 1  and date(time) < now() "
           + "and moderation_status  = 'ACCEPTED' order by (select count(*) from post_comment\n"
           + "where post.id = post_comment.post_id) desc, view_count desc", nativeQuery = true)
   List<Post> findByPopular(Pageable page);
 
   @Query(value =
-      "SELECT * FROM post where is_active = 1 "
+      "SELECT * FROM post where is_active = 1 and date(time) < now() "
           + "and moderation_status  = 'ACCEPTED' order by (select sum(value = 1) from post_vote\n"
           + "where post.id = post_vote.post_id) desc, view_count desc", nativeQuery = true)
   List<Post> findByBest(Pageable page);
 
-  @Query(value = "SELECT * FROM post where is_active = 1 "
+  @Query(value = "SELECT * FROM post where is_active = 1 and date(time) < now() "
       + "and moderation_status = 'ACCEPTED' and id in "
       + "(select post_id from tag2post where tag_id = :tagId)"
       + "order by time desc", nativeQuery = true)
@@ -53,29 +53,29 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
       , nativeQuery = true)
   List<YearsListForCalendar> getYears();
 
-  @Query(value = "SELECT COUNT(*) FROM post as p where is_active = 1 "
+  @Query(value = "SELECT COUNT(*) FROM post as p where is_active = 1 and date(time) < now() "
       + "and moderation_status = 'ACCEPTED' and date(p.time) = :date", nativeQuery = true)
   int getCountOfPostsByDate(Date date);
 
 
   @Query(value = "SELECT time as date, count(time) as count FROM post"
-      + " where is_active = 1 and moderation_status = 'ACCEPTED'"
+      + " where is_active = 1 and moderation_status = 'ACCEPTED' and date(time) < now() "
       + " and year(time) = :year"
       + " group by date(time) order by date(time)", nativeQuery = true)
   List<CountsPostsByDate> getCountPostsGroupByDate(@Param(value = "year") int year);
 
   @Query(value = "select * from post p where is_active = 1"
-      + " and moderation_status = 'ACCEPTED' "
+      + " and moderation_status = 'ACCEPTED' and date(time) < now() "
       + "and (p.title like %:query% or p.text like %:query%) order by -time", nativeQuery = true)
   List<Post> findPostsByQuery(Pageable pageable, @Param(value = "query") String query);
 
   @Query(value = "select count(*) from post p where is_active = 1"
-      + " and moderation_status = 'ACCEPTED' "
+      + " and moderation_status = 'ACCEPTED' and date(time) < now() "
       + "and p.title like %:query% or p.text like %:query% order by -time", nativeQuery = true)
   int getCountOfPostsByQuery(String query);
 
   @Query(value = "select count(*) from post where is_active = 1"
-      + " and moderation_status = 'ACCEPTED'"
+      + " and moderation_status = 'ACCEPTED' and date(time) < now() "
       , nativeQuery = true)
   int getPosts2ShowCount();
 
@@ -174,14 +174,15 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
       + " (select count(value) from post_vote"
       + " right join post p on post_vote.post_id = p.id"
       + " where value > 0 and p.is_active = 1"
-      + " and p.moderation_status = 'ACCEPTED') as likesCount, "
+      + " and p.moderation_status = 'ACCEPTED' and date(time) < now()) as likesCount, "
       + " (select count(value) from post_vote"
       + " right join post p on post_vote.post_id = p.id"
       + " where value < 0 and p.is_active = 1"
-      + " and p.moderation_status = 'ACCEPTED') as dislikesCount,"
+      + " and p.moderation_status = 'ACCEPTED' and date(time) < now()) as dislikesCount,"
       + " sum(view_count) as viewsCount,"
       + " min(post.time) as firstPublication"
-      + " FROM post where is_active = 1 and moderation_status = 'ACCEPTED'", nativeQuery = true)
+      + " FROM post where is_active = 1 "
+      + " and moderation_status = 'ACCEPTED' and date(time) < now() ", nativeQuery = true)
   Statistic getBlogStatistic();
 
   @Query(value = "SELECT"

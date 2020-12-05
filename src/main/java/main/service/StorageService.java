@@ -53,11 +53,13 @@ public class StorageService {
 
     Map params = ObjectUtils.asMap(
         "public_id", path,
-        "bytes", maxUploadSize,
         "resource_type", "image"
     );
 
     try {
+      if (imageBytes.length > maxUploadSize) {
+        throw new RuntimeException();
+      }
       cloudinary.uploader().upload(imageBytes, params);
     } catch (RuntimeException ex){
       throw new IOException("Загрузите изображение с размером не более 5 Мб");
