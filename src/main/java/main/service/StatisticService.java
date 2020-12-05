@@ -59,7 +59,7 @@ public class StatisticService {
               .getViewsCount())
           .build(), HttpStatus.OK);
     } else {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
   }
 }

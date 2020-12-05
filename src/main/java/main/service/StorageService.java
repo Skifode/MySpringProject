@@ -1,15 +1,13 @@
 package main.service;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
+import com.cloudinary.utils.ObjectUtils;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Map;
 import java.util.UUID;
-import javax.imageio.ImageIO;
 import main.data.UploadType;
-import org.imgscalr.Scalr;
-import org.imgscalr.Scalr.Method;
-import org.imgscalr.Scalr.Mode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -25,54 +23,71 @@ public class StorageService {
   @Value("${upload.image}")
   private String imageUploadDirectory;
 
+  @Value("${cloudinary.url}")
+  private String cloudURL;
+
   @Value("${avatar.width}")
   private int targetWidth;
 
   @Value("${avatar.height}")
   private int targetHeight;
 
+  @Value("${max.upload.image-size.bytes}")
+  private int maxUploadSize;
+
+  private final Cloudinary cloudinary;
+
+  @Autowired
+  public StorageService(Cloudinary cloudinary) {
+    this.cloudinary = cloudinary;
+  }
+
   public String saveImage(MultipartFile image, UploadType type) throws IOException {
 
-    String contentType = Objects
-        .requireNonNull(image.getContentType())
-        .toLowerCase()
-        .split("/")[1]; // ex: image/jpg
-    String path = getRandomPath() + image.getOriginalFilename();
+    byte[] imageBytes = image.getBytes();
 
-    if (!contentType.contains("jpg") &&
-        !contentType.contains("jpeg") ||
-        image.getBytes().length > 5242880) {
-      throw new IOException("Загрузите фотографию в формате JPG или JPEG"
-          + " с размером не более 5 Мб");
+    String path = switch (type) {
+      case IMAGE -> imageUploadDirectory;
+      case AVATAR -> avatarsUploadDirectory;
+    } + getRandomPath();
+
+    Map params = ObjectUtils.asMap(
+        "public_id", path,
+        "bytes", maxUploadSize,
+        "resource_type", "image"
+    );
+
+    try {
+      cloudinary.uploader().upload(imageBytes, params);
+    } catch (RuntimeException ex){
+      throw new IOException("Загрузите изображение с размером не более 5 Мб");
     }
 
-    String filePath = switch (type) {
-      case IMAGE -> imageUploadDirectory + path;
-      case AVATAR -> avatarsUploadDirectory + path;
+    return switch (type) {
+      case IMAGE -> getCloudPath(path);
+      case AVATAR -> getCloudPath2Avatars(path);
     };
-    BufferedImage bufferedImage = switch (type) {
-      case AVATAR -> resizeImage(ImageIO.read(image.getInputStream()));
-      case IMAGE -> ImageIO.read(image.getInputStream());
-    };
+  }
 
-    if (new File(filePath).mkdirs() || !new File(filePath).exists()) {
-      ImageIO.write(bufferedImage, contentType, new File(filePath));
-    } else {
-      return saveImage(image, type);
-    }
-    return filePath.split("images")[1];
+  public String getCloudPath(String path) {
+    return cloudinary
+        .url()
+        .generate(path);
+  }
+
+  public String getCloudPath2Avatars(String path) {
+    return cloudinary
+        .url()
+        .transformation(
+            new Transformation<>()
+                .width(targetWidth)
+                .height(targetHeight))
+        .generate(path);
   }
 
   private String getRandomPath() {
     String[] randomPath = UUID.randomUUID().toString().split("-");
-    return String.format("/%s" + "/%s" + "/%s/",
-        randomPath[1], randomPath[2], randomPath[3]);
-  }
-
-  private BufferedImage resizeImage(
-      BufferedImage originalImage) {
-    return Scalr.resize(
-        originalImage, Method.ULTRA_QUALITY, Mode.AUTOMATIC,
-        targetWidth, targetHeight, Scalr.OP_ANTIALIAS);
+    return String.format("/%s" + "/%s" + "/%s/" + "%s",
+        randomPath[1], randomPath[2], randomPath[3], randomPath[0]);
   }
 }

@@ -10,9 +10,11 @@ spring.servlet.multipart.enabled: true
 spring.servlet.multipart.max-file-size: 25MB
 spring.servlet.multipart.max-request-size: 25MB
 
+max.upload.image-size.bytes: 5242880
+
 blog.path: ${BLOG_PATH:http://localhost:8080/}
 
-upload.file.path: images
+static.classpath: classpath:/static/
 upload.avatars: images/avatars
 upload.image: images/posts
 
@@ -34,7 +36,11 @@ blog.copyrightFrom: все права не защитить. 2005
 spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation: true
 
 spring.mail.host: smtp.yandex.ru
-spring.mail.username: ${MAIL_USERNAME}
-spring.mail.password: ${MAIL_PASSWORD}
+spring.mail.username: ${MAIL_USERNAME:username}
+spring.mail.password: ${MAIL_PASSWORD:password}
 spring.mail.port: 465
 spring.mail.protocol: smtps
+
+cloudinary.url: ${CLOUDINARY_URL:url}
+cloudinary.api.key: ${CLOUDINARY_API_KEY:0000}
+cloudinary.api.secret: ${CLOUDINARY_API_SECRET:secret}

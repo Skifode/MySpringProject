@@ -41,6 +41,7 @@
       <artifactId>spring-boot-starter-mail</artifactId>
     </dependency>
 
+
     <dependency>
       <groupId>com.github.cage</groupId>
       <artifactId>cage</artifactId>
@@ -63,6 +64,11 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
@@ -74,9 +80,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.imgscalr</groupId>
-      <artifactId>imgscalr-lib</artifactId>
-      <version>4.2</version>
+      <groupId>com.cloudinary</groupId>
+      <artifactId>cloudinary-http44</artifactId>
+      <version>1.27.0</version>
     </dependency>
   </dependencies>
 

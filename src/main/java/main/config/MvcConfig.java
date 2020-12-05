@@ -10,12 +10,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class MvcConfig implements WebMvcConfigurer {
 
-  @Value("${upload.file.path}")
-  private String filePath;
+  @Value("${static.classpath}")
+  private String classpath;
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/**")
-    .addResourceLocations("classpath:/static/", "file:" + filePath + "/");
+    .addResourceLocations(classpath);
   }
 }
