@@ -41,6 +41,6 @@ spring.mail.password: ${MAIL_PASSWORD:password}
 spring.mail.port: 465
 spring.mail.protocol: smtps
 
-cloudinary.url: ${CLOUDINARY_URL:url}
+cloudinary.url: ${CLOUDINARY_URL:cloudinary://url}
 cloudinary.api.key: ${CLOUDINARY_API_KEY:0000}
 cloudinary.api.secret: ${CLOUDINARY_API_SECRET:secret}
