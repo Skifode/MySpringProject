@@ -179,7 +179,7 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
       + " right join post p on post_vote.post_id = p.id"
       + " where value < 0 and p.is_active = 1"
       + " and p.moderation_status = 'ACCEPTED' and date(p.time) < now()) as dislikesCount,"
-      + " sum(view_count) as viewsCount,"
+      + " coalesce(sum(view_count), 0) as viewsCount,"
       + " min(post.time) as firstPublication"
       + " FROM post where is_active = 1 "
       + " and moderation_status = 'ACCEPTED' and date(time) < now() ", nativeQuery = true)
@@ -195,7 +195,7 @@ public interface PostsRepository extends CrudRepository<Post, Integer> {
       + " right join post p on post_vote.post_id = p.id"
       + " where value < 0 and p.is_active = 1 and p.user_id = :user_id"
       + " and p.moderation_status = 'ACCEPTED') as dislikesCount,"
-      + " sum(view_count) as viewsCount,"
+      + " coalesce(sum(view_count), 0) as viewsCount,"
       + " min(post.time) as firstPublication"
       + " FROM post where is_active = 1 and moderation_status = 'ACCEPTED'"
       + " and user_id = :user_id", nativeQuery = true)
