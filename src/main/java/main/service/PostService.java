@@ -226,9 +226,12 @@ public class PostService {
   public ResponseEntity<?> addNewPost(AddPostRequest request, String email) {
 
     TreeMap<String, String> errors = postIsCorrect(request);
+    int userId = usersRepository.findByEmail(email).getId();
 
     if (errors.isEmpty()) {
-      return postAddResponse(new Post(), request, email);
+      Post post = new Post();
+      post.setUserId(userId);
+      return postAddResponse(post, request);
     }
     return new ResponseEntity<>(ResultErrorsResponse
         .builder()
@@ -392,7 +395,7 @@ public class PostService {
       } catch (NoSuchElementException ex) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
-      return postAddResponse(post, request, email);
+      return postAddResponse(post, request);
     }
     return new ResponseEntity<>(ResultErrorsResponse
         .builder()
@@ -401,8 +404,7 @@ public class PostService {
         .build(), HttpStatus.BAD_REQUEST);
   }
 
-  private ResponseEntity<?> postAddResponse(Post post, AddPostRequest request, String email) {
-    int userId = usersRepository.findByEmail(email).getId();
+  private ResponseEntity<?> postAddResponse(Post post, AddPostRequest request) {
     Date now = new Date();
     Date date = new Date(TimeUnit.SECONDS.toMillis(request.getTimestamp()));
     date = date.before(now) ? now : date;
@@ -416,7 +418,6 @@ public class PostService {
     post.setText(request.getText());
     post.setTitle(request.getTitle());
     post.setTime(date);
-    post.setUserId(userId);
     postsRepository.save(post);
 
     return new ResponseEntity<>(ResultErrorsResponse

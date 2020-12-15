@@ -7,11 +7,11 @@ import lombok.Getter;
 @Builder
 public class UserLoginResponse {
 
-  private int id;
-  private String name;
-  private String photo;
-  private String email;
-  private boolean moderation;
-  private int moderationCount;
-  private boolean settings;
+  private final int id;
+  private final String name;
+  private final String photo;
+  private final String email;
+  private final boolean moderation;
+  private final int moderationCount;
+  private final boolean settings;
 }
